@@ -3,8 +3,8 @@
 For every ordered pair (source, target) where the target starts after the source ends, six
 cost terms are computed, each divided by a fixed scale and weighted (both set in weights.py).
 Pairs that overlap or run backwards in time get infinite cost. A Hungarian solve over an
-augmented matrix then picks a one-to-one set of links: each source either takes one target or a "no match"
-option, so every tracklet ends up with at most one successor and one predecessor.
+augmented matrix then picks a one-to-one set of links: each source either takes one target
+or a "no match" option, so every tracklet ends up with at most one successor and predecessor.
 """
 
 import numpy as np

@@ -154,3 +154,20 @@ def test_associate_errors_are_json(payload, status, code):
 def test_unknown_scenario_is_404():
     r = client.get("/scenarios/train/does_not_exist")
     assert r.status_code == 404 and r.json()["error"]["code"] == "not_found"
+
+
+def test_tune_scoring_matches_evaluation():
+    from aircraft_track_association.evaluate import link_metrics
+    from aircraft_track_association.io import load_successors
+    from aircraft_track_association.tune import prepare, score
+    from aircraft_track_association.weights import WEIGHTS
+
+    dirs = [DATA / "test" / "scenario_014", SCENARIO]
+    s = score(prepare(dirs), WEIGHTS)
+    wrong = unresolved = 0
+    for d in dirs:
+        m = link_metrics(
+            links(analyze(**read_snapshot(d))["results"]["gaussian"]), load_successors(d)
+        )
+        wrong, unresolved = wrong + m["wrong_links"], unresolved + m["unreported_links"]
+    assert (s["wrong"], s["unresolved"]) == (wrong, unresolved)

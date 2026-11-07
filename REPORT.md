@@ -124,6 +124,105 @@ The held-out and validation figures for all three weights were seen before this 
 The weight order plausibility > vel_w2 > pos_w2 is kept.
 Raw weights are not directly comparable across terms, because the fixed scales differ.
 
+## Validation weight search
+
+The hand-tuned weights above are kept as the weight set `train_hand_tuned`.
+A second set, `validation_search`, was found by random search on the validation partition, as the challenge asks for decision settings (`python -m aircraft_track_association tune candidate-packet/data/validation/scenario_* --trials 2000 --seed 0`, see `tune.py`).
+
+- Each weight is sampled log-uniformly in [0.01, 10], keeping plausibility > vel_w2 > pos_w2.
+- Scales and the no-match cost (1.0) stay fixed, since scaling every weight is equivalent to moving the no-match cost.
+- The objective is 2 x wrong links + unresolved links, so a wrong link counts double.
+- Ties are broken by the larger mean margin between each true link's cost and its best competitor, relative to the no-match cost.
+- Trial 0 is the hand-tuned set, which scores 5 (1 wrong, 3 unresolved) on validation.
+
+| Term | train_hand_tuned | validation_search |
+| --- | ---: | ---: |
+| plausibility | 0.35 | 0.2474 |
+| heading | 3.0 | 0.6202 |
+| vel_cos | 0.15 | 0.0116 |
+| vel_w2 | 0.05 | 0.0464 |
+| pos_w2 | 0.03 | 0.0109 |
+| alt_w2 | 0.3 | 1.8751 |
+| dt | 0.15 | 0.0115 |
+
+| Weight set | Partition | Correct / true links | Wrong | Unresolved | Precision | Recall |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| train_hand_tuned | Train (80) | 1337 / 1364 | 12 | 15 | 0.991 | 0.980 |
+| train_hand_tuned | Validation (20) | 331 / 335 | 1 | 3 | 0.997 | 0.988 |
+| train_hand_tuned | Test (20) | 333 / 339 | 4 | 2 | 0.988 | 0.982 |
+| validation_search | Train (80) | 1356 / 1364 | 7 | 1 | 0.995 | 0.994 |
+| validation_search | Validation (20) | 335 / 335 | 0 | 0 | 1.000 | 1.000 |
+| validation_search | Test (20) | 337 / 339 | 2 | 0 | 0.994 | 0.994 |
+
+Several of the 2000 trials reached zero errors on validation, so the validation figure for `validation_search` is optimistic by construction.
+Train was not used by the search, and there `validation_search` makes fewer wrong links (7 vs 12) and far fewer unresolved ones (1 vs 15).
+Test was run once for each set after both were fixed.
+Note that the hand-tuned set was itself developed while train 012-080 and validation results were visible (see the tuning log), so neither set's train or validation figures are fully blind.
+Compared with the hand-tuned set, the search puts most weight on altitude and much less on heading, velocity direction and the gap penalty.
+`train_hand_tuned` remains the default; set `ATA_WEIGHT_SET=validation_search` to use the other set in the CLI and the service.
+
+## Failure analysis: test scenario 014
+
+With `train_hand_tuned`, test scenario 014 has 3 of the 4 wrong links in the test partition (14 of 17 correct).
+The three wrong links form one chain: `d89bbd46` takes `6083b6f9`, which is the true successor of `3c93ea1c`; `3c93ea1c` then takes `feb43402`, which is the true successor of `6083b6f9`; and `6083b6f9` takes `dabe035c`, which is the true successor of `d89bbd46`.
+With `validation_search`, all 17 links in this scenario are correct.
+
+Each table compares the reported (wrong) successor with the labelled one.
+"Raw" is the unweighted term and "Weighted" its contribution to the total cost (weight x raw / scale); lower is better.
+
+### 1. `3c93ea1c`: reported `feb43402`, labelled `6083b6f9`
+
+Labelled successor `6083b6f9` was assigned to `d89bbd46`.
+
+| Term | Raw, reported | Raw, labelled | Weighted, reported | Weighted, labelled |
+| --- | ---: | ---: | ---: | ---: |
+| plausibility | 0.0381 | 0.0441 | 0.053 | 0.062 |
+| heading | 0.000172 | 0.0000923 | 0.026 | 0.014 |
+| vel_cos | 0.000553 | 0.000254 | 0.017 | 0.008 |
+| vel_w2 (m/s) | 32.4 | 34.0 | 0.045 | 0.047 |
+| pos_w2 (m) | 66,630 | 33,610 | 0.036 | 0.018 |
+| alt_w2 (m) | 87.1 | 15.4 | 0.037 | 0.007 |
+| dt (s) | 336 | 123 | 0.224 | 0.082 |
+| **Total** | | | **0.438** | **0.237** |
+
+Reason: _to be added._
+
+### 2. `d89bbd46`: reported `6083b6f9`, labelled `dabe035c`
+
+Labelled successor `dabe035c` was assigned to `6083b6f9`.
+
+| Term | Raw, reported | Raw, labelled | Weighted, reported | Weighted, labelled |
+| --- | ---: | ---: | ---: | ---: |
+| plausibility | 0.0572 | 0.0509 | 0.080 | 0.071 |
+| heading | 0.0000124 | 0.000132 | 0.002 | 0.020 |
+| vel_cos | 0.000389 | 0.00318 | 0.012 | 0.095 |
+| vel_w2 (m/s) | 8.26 | 35.1 | 0.011 | 0.049 |
+| pos_w2 (m) | 31,890 | 61,360 | 0.017 | 0.033 |
+| alt_w2 (m) | 272.5 | 169.5 | 0.117 | 0.073 |
+| dt (s) | 117 | 325 | 0.078 | 0.217 |
+| **Total** | | | **0.317** | **0.558** |
+
+Reason: _to be added._
+
+### 3. `6083b6f9`: reported `dabe035c`, labelled `feb43402`
+
+Labelled successor `feb43402` was assigned to `3c93ea1c`.
+
+| Term | Raw, reported | Raw, labelled | Weighted, reported | Weighted, labelled |
+| --- | ---: | ---: | ---: | ---: |
+| plausibility | 0.0088 | 0.0133 | 0.012 | 0.019 |
+| heading | 0.0000123 | 0.000938 | 0.002 | 0.141 |
+| vel_cos | 0.00164 | 0.00140 | 0.049 | 0.042 |
+| vel_w2 (m/s) | 31.1 | 11.1 | 0.043 | 0.015 |
+| pos_w2 (m) | 29,480 | 33,020 | 0.016 | 0.018 |
+| alt_w2 (m) | 440.8 | 98.4 | 0.189 | 0.042 |
+| dt (s) | 110 | 115 | 0.073 | 0.077 |
+| **Total** | | | **0.384** | **0.353** |
+
+Reason: _to be added._
+
+Across the chain, the assignment's total for the reported links is 0.438 + 0.317 + 0.384 = 1.139, against 0.237 + 0.558 + 0.353 = 1.148 for the labelled links, so the solver's choice is the cheaper one by 0.009.
+
 ## Errors
 
 | Partition | Wrong aircraft | Skipped intermediate | Left unlinked | False link from last tracklet |

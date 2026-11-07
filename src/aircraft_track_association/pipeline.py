@@ -41,6 +41,7 @@ def config() -> dict:
         },
         "baseline": {"tolerance": baseline.TOLERANCE},
         "gaussian": {
+            "weight_set": weights.WEIGHT_SET,
             "weights": weights.WEIGHTS,
             "scales": weights.SCALES,
             "no_match_cost": weights.NO_MATCH_COST,

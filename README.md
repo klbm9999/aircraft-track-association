@@ -97,9 +97,29 @@ Results do not depend on input order or on identical duplicates; tests check bot
 | `received_at` | used only to apply receipt cutoffs | documented; it says when evidence was available, not where the aircraft was |
 | supporting `a1` | used to fill missing altitude | undocumented; inferred as altitude in metres, see below |
 | `source` | not a feature | used only to restrict near-duplicate removal to the same feed |
-| observation `attributes` (`spd`, `hdg`, `c2`, `v`, `ref`, `tag`, `q`, `node`, `r7`, ...) | excluded | units and meanings are undocumented or inconsistent between feeds; not investigated yet |
-| supporting `spd`, `b4`, `rx` | excluded | uncorrelated with altitude (correlation near 0); not compared with speed or heading yet; `b4` does not change `a1`'s accuracy |
+| observation `attributes` | excluded | see the per-feed table below; interpretations are inferred from training data, not documented |
+| supporting `spd`, `b4`, `rx` | excluded | uncorrelated with altitude (correlation near 0); not compared with speed or heading; `b4` does not change `a1`'s accuracy |
 | IDs and file order | never features | used only for grouping, joining and tie-breaking |
+
+Observation attributes, checked against speed and heading computed from each tracklet's positions on the 80 train scenarios:
+
+| Feed | Field | Likely meaning | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| feed-a | `spd` | speed in knots | median ratio to computed speed in m/s is 1.946 (1 m/s = 1.944 kn), as the source notes say; 94% within 10% after conversion, 3.9% off by more than half | excluded |
+| feed-b | `spd` | speed in m/s | median ratio 1.002; 93% within 10%, 5.8% off by more than half | excluded |
+| feed-c | `v` | speed in km/h | median ratio 3.602 (1 m/s = 3.6 km/h); 94% within 10%, 2.5% off by more than half | excluded |
+| feed-a | `crs` | heading in degrees | median difference from computed heading 1.8 degrees | excluded |
+| feed-b | `c2` | heading in degrees | median difference 1.7 degrees | excluded |
+| feed-c | `hdg` | heading in degrees | median difference 1.8 degrees | excluded |
+| feed-a, feed-b | `ref` | reported aircraft identifier | constant within every tracklet; shared by 41% of true successor pairs (with `tag`) but also by 5.5% of other candidate pairs | excluded |
+| feed-c | `tag` | reported aircraft identifier | as `ref` | excluded |
+| all | `q` | quality code, meaning unknown | integers 0-3 in feed-a, strings "0"-"3" in feed-b, H/M/L in feed-c; one value in each feed is rare (under 1%) | excluded |
+| all | `node` | ingest worker (`worker-N`) | transport diagnostic, not aircraft behaviour | excluded |
+| all | `r7` | unknown | uniform between -10 and 10, uncorrelated with speed or heading | excluded |
+
+The speed and heading fields are plausible but redundant: the Gaussian model already measures speed and direction from positions, and the reported values include gross errors in 2.5-5.8% of reports.
+The identifiers change between fragments of the same aircraft more often than not and are sometimes shared by different aircraft, so they are not reliable identity evidence on their own; they could be a feature for a learned model.
+Leaving them out keeps both approaches on documented fields plus `a1`.
 
 `a1` is read as altitude in metres because, on the 10,194 train observations that also report `altitude_ft`, it agrees with `altitude_ft * 0.3048` with correlation 0.999, median ratio 1.000 and at most 162 m difference.
 It is null in about 12% of supporting records and fills 54% of missing altitudes.
@@ -115,12 +135,53 @@ This is an inference from data, not a documented meaning.
 
 ## Known limitations
 
-- No learned approach yet, and so no training command, model artifact or random seed. Both approaches are deterministic and configured in code; `GET /health` and every result report the configuration hash.
-- The Gaussian model's weights, scales, velocity window and no-match cost were chosen by hand from training labels, not by a systematic search, and the operating threshold was not chosen on validation as the challenge asks.
+- No learned approach yet, and so no training command or model artifact. Both approaches are deterministic and configured in code; `GET /health` and every result report the configuration hash. The only randomness is the weight search, seeded (`--seed 0`).
+- Two weight sets exist for the Gaussian model: `train_hand_tuned` (default, tuned by hand on train) and `validation_search` (random search on validation). The second makes fewer errors on train and test; see REPORT.md. Scales, the velocity window and the no-match cost were set by hand.
 - Lowering the no-match cost removes few wrong links per unresolved link it adds; most remaining wrong links are confident swaps between nearby aircraft. Abstaining when the best and second-best candidates are close would target them better.
 - The `dt` penalty grows with the absolute gap, so it cannot be raised to stop skipped tracklets without also penalising long true gaps.
 - No stress test has been run.
 - Results are on synthetic data with simplified motion and sources; they are not evidence of real-world accuracy.
+
+## Demonstrations (train scenario_001)
+
+Scenario_001 has 24 tracklets: six aircraft, each seen in four fragments about two minutes long with gaps of 80-140 s.
+With the default weights the Gaussian model gets all 18 links right; the baseline gets 6 right with 6 wrong and disagrees with it on 12 of 24 tracklets.
+In the interface, choose `train / scenario_001` and click a tracklet to see the details below.
+
+**A clear continuation.** `4aa1f86b -> 27f73aa2` is accepted with cost 0.136: gap 117 s, plausibility 0.009 (distance within 1% of the projection), altitude difference 10 m, target almost exactly on the source's line of travel.
+The next candidate, `e293fd97`, costs 4.755, mainly because it sits 865 m lower and off the line of travel.
+The baseline leaves `4aa1f86b` unresolved: its best candidate within 5% is `e293fd97`, which another source had already taken with a closer ratio.
+
+**Competing plausible continuations.** For `7e157a59`, three candidates have nearly identical plausibility (0.015-0.016) and all lie along its line of travel.
+The labelled successor `d7c3b003` (cost 0.216, gap 111 s) wins over `b22bc68f` (0.339, gap 334 s) and `03b4b60d` (0.545, gap 559 s), which are the same aircraft's next two fragments after `d7c3b003`.
+The gap penalty is what separates them: accepting `b22bc68f` would skip an available intermediate tracklet, which counts as wrong.
+The baseline accepts `f1642a8a` for this source instead (ratio 0.980), which belongs to another aircraft (it is the labelled successor of `054df159`); the baseline checks speed, not direction, so it cannot tell them apart.
+
+**Unresolved tracklets.** The six tracklets in the last two-minute window are left unresolved by both approaches, with the reason "no tracklet starts after this one ends".
+The labels agree: none of them has a successor in this scenario.
+
+**A decision revised by new evidence.** See [Additional evidence](#additional-evidence-staged-demo) above.
+
+**Reordered and duplicated input.** Shuffling scenario_001's 322 observation rows, adding 25 duplicated rows and reversing the supporting records gives identical decisions and the same input hash (`9b7c1b59c4ae...`).
+`tests/test_pipeline.py` checks the same property on validation scenario_001.
+
+## From synthetic to real data
+
+This dataset makes association easier than real traffic in several ways:
+
+- Motion is smooth and subsonic with no takeoffs, landings, holding patterns or sharp turns, so straight-line extrapolation across a two-minute gap works almost perfectly.
+- Every scenario has exactly six aircraft with fragments in regular two-minute windows, so the structure of gaps is uniform.
+- Same-aircraft fragments never overlap, which removes a whole class of candidates.
+- Position noise is moderate and roughly constant; real sensors vary by source, range and geometry.
+- Labels are complete and correct.
+
+Before trusting this on real observations, I would check:
+
+- how extrapolation error grows with gap length and manoeuvres, and whether the gap gate and costs need a motion model that allows turns,
+- per-source noise and bias, including timestamp offsets between feeds,
+- how often real reported identifiers (`ref`, `tag`) persist across gaps and how often they collide, since they could be strong evidence there,
+- precision at the operating point on a labelled sample from the target airspace, with wrong links reviewed by hand,
+- behaviour under dense traffic, where many more candidates compete for each tracklet.
 
 ## Setup and commands
 
@@ -140,6 +201,13 @@ uv run python -m aircraft_track_association evaluate candidate-packet/data/train
 uv run python -m aircraft_track_association evaluate candidate-packet/data/validation/scenario_*
 uv run python -m aircraft_track_association evaluate candidate-packet/data/test/scenario_*
 uv run python -m aircraft_track_association evaluate candidate-packet/data/test/scenario_014 --approach gaussian
+```
+
+Search Gaussian-model weights on validation (prints the best trials; does not edit `weights.py`), and evaluate with a named weight set:
+
+```bash
+uv run python -m aircraft_track_association tune candidate-packet/data/validation/scenario_* --trials 2000 --seed 0
+ATA_WEIGHT_SET=validation_search uv run python -m aircraft_track_association evaluate candidate-packet/data/test/scenario_* --approach gaussian
 ```
 
 Run association on one snapshot without labels and save the result (this is how `results/staged_demo/` was produced):
@@ -211,7 +279,8 @@ Labels are never read by this endpoint.
   - `io.py` - validation, deduplication, file loading.
   - `track.py` - projection, altitude, near-duplicates, tracklet Gaussians.
   - `baseline.py` - the baseline rule.
-  - `associate.py`, `weights.py` - the Gaussian continuity model and its settings.
+  - `associate.py`, `weights.py` - the Gaussian continuity model and its named weight sets.
+  - `tune.py` - random weight search against labels.
   - `decision.py` - the per-tracklet decision record both approaches return.
   - `pipeline.py` - one analysis run, shared by the CLI and the service.
   - `evaluate.py` - link metrics.
@@ -223,5 +292,5 @@ Labels are never read by this endpoint.
 
 ## Status
 
-Done: data preparation, both approaches with per-tracklet decisions and reasons, evaluation on all partitions, staged demo with saved results, backend, web interface and tests.
-Not done: a learned approach and its comparison, threshold selection on validation, a stress test, a written failure analysis of test errors, and investigation of the optional observation attributes.
+Done: data preparation, both approaches with per-tracklet decisions and reasons, evaluation on all partitions, a weight search on validation, failure analysis of test scenario 014 (REPORT.md), staged demo with saved results, investigation of the optional fields, backend, web interface and tests.
+Not done: a learned approach and its comparison, and a stress test.

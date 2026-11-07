@@ -2,6 +2,7 @@
 
     python -m aircraft_track_association evaluate <scenario_dir> [...] [--approach NAME]
     python -m aircraft_track_association analyze <scenario_dir> [-o result.json]
+    python -m aircraft_track_association tune <scenario_dir> [...] [--trials 2000] [--seed 0]
     python -m aircraft_track_association serve [--host 127.0.0.1] [--port 8000]
 
 evaluate: run association and score it against labels. With one directory it also prints,
@@ -9,6 +10,8 @@ evaluate: run association and score it against labels. With one directory it als
     With several it prints one line per scenario and micro-averaged totals.
 analyze: run every approach on one snapshot and print or save the full result (inputs hash,
     model version, configuration, per-tracklet decisions). Labels are not read.
+tune: random search for Gaussian-model weights against labels (see tune.py); prints the best
+    trials. It does not change weights.py.
 serve: start the HTTP service and web interface.
 """
 
@@ -81,6 +84,10 @@ def main() -> None:
     an = sub.add_parser("analyze", help="run association on one snapshot, no labels")
     an.add_argument("scenario_dir", type=Path)
     an.add_argument("-o", "--output", type=Path, help="write the result JSON here")
+    tu = sub.add_parser("tune", help="search Gaussian-model weights against labels")
+    tu.add_argument("scenario_dirs", nargs="+", type=Path)
+    tu.add_argument("--trials", type=int, default=2000)
+    tu.add_argument("--seed", type=int, default=0)
     sv = sub.add_parser("serve", help="start the HTTP service and web interface")
     sv.add_argument("--host", default="127.0.0.1")
     sv.add_argument("--port", type=int, default=8000)
@@ -99,6 +106,18 @@ def main() -> None:
             args.output.write_text(text + "\n")
         else:
             print(text)
+    elif args.command == "tune":
+        from .tune import search
+
+        best = search(args.scenario_dirs, args.trials, args.seed)
+        for r in best[:5]:
+            print(
+                f"trial {r['trial']:4}  objective {r['objective']:3}  wrong {r['wrong']:3}  "
+                f"unresolved {r['unresolved']:3}  margin {r['margin']:.3f}"
+            )
+        current = next(r for r in best if r["trial"] == 0)
+        print(f"current weights: objective {current['objective']}, margin {current['margin']:.3f}")
+        print("best weights:", json.dumps({k: round(v, 4) for k, v in best[0]["weights"].items()}))
     else:
         import uvicorn
 

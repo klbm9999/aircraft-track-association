@@ -13,8 +13,9 @@ Each approach returns one record per tracklet, in tracklet (start time, id) orde
       ],
     }
 
-Scores are costs: lower is better, 0 is a perfect fit. They are not probabilities and are not
-calibrated; each approach documents its own scale.
+Each approach documents its own scale. Baseline and Gaussian scores are costs: lower is
+better, and 0 is a perfect fit. The learned score is a predicted chance that the candidate
+is the immediate next tracklet: higher is better. None of the scores are calibrated.
 """
 
 MAX_CANDIDATES = 5

@@ -3,13 +3,16 @@
 Govia ML Engineer take-home: decide which disconnected aircraft movement fragments (tracklets) belong together.
 For each tracklet the system either accepts one successor (the next fragment of the same aircraft) or leaves it unresolved, and explains why.
 
-Two approaches are implemented and compared:
+Three approaches are implemented and compared:
 
 - **Baseline** - a constant-velocity projection rule with a fixed 5% tolerance.
 - **Gaussian continuity model** - each tracklet is summarised as position, altitude and velocity Gaussians, candidate links are scored with seven continuity costs, and a global assignment picks a consistent set of links.
+- **Learned** - a gradient-boosted classifier scores each candidate pair, then greedy selection keeps a link only when the score and its margin clear a threshold chosen on validation.
+  The learned approach was produced by an AI coding agent as a port of an AI-built reference solution.
+  It was not designed by the author.
 
-Neither approach learns from data: the baseline has one fixed setting, and the Gaussian model's weights were tuned by hand on training scenarios.
-The learned approach that the challenge asks for is not built yet (see [Status](#status)).
+The baseline has one fixed setting, and the Gaussian model's weights were tuned by hand on training scenarios.
+The learned model is fit on train candidate pairs only.
 
 ## Results
 
@@ -24,11 +27,18 @@ Micro-averaged over every scenario in each partition, counting exact directed su
 | Gaussian | Train (80) | 1337 / 1364 | 12 | 15 | 0.991 | 0.980 |
 | Gaussian | Validation (20) | 331 / 335 | 1 | 3 | 0.997 | 0.988 |
 | Gaussian | Test (20) | 333 / 339 | 4 | 2 | 0.988 | 0.982 |
+| Learned | Train (80) | 1364 / 1364 | 0 | 0 | 1.000 | 1.000 |
+| Learned | Validation (20) | 327 / 335 | 0 | 8 | 1.000 | 0.976 |
+| Learned | Test (20) | 327 / 339 | 0 | 12 | 1.000 | 0.965 |
 
 The Gaussian model's settings were frozen before the test labels were first read, and nothing was changed after.
 The baseline's 5% tolerance was given up front, not tuned.
+The learned approach was developed on train and validation only and then run on test once.
+The test labels had already been read, during earlier work on the baseline and the Gaussian model, before this approach was added.
+Its operating point maximises validation recall among settings with precision at least 0.95: minimum score 0.05 and minimum margin 0.20.
+On that validation sweep the permissive setting (margin 0) and the conservative setting (mutual best) are both precision 0.997 and recall 0.973, with one wrong link; the operating margin removes that wrong link.
 Tracklets without a labelled successor were never given one by the Gaussian model in any partition.
-Candidate generation keeps every pair whose target starts after its source ends, so candidate-generation recall is 100% for both approaches.
+Candidate generation keeps every pair whose target starts after its source ends, so candidate-generation recall is 100% for all three approaches.
 Full tuning history, error analysis and the trade-off between wrong and unresolved links are in [REPORT.md](REPORT.md).
 
 The baseline's precision stays between 0.25 and 0.36 at any tolerance on validation, so tightening it cannot make it trustworthy:
@@ -82,8 +92,18 @@ Each candidate pair is scored by a weighted sum of seven costs:
 A Hungarian assignment over the cost matrix, extended with a "no match" option per source at cost 1.0, selects links so every tracklet has at most one successor and one predecessor.
 A competing candidate can lose even when it is a source's cheapest option, if giving it to another source lowers the total cost; the decision reason says so.
 
-**Scores** are costs for both approaches: lower is better and 0 is a perfect fit.
-They are not probabilities and have not been calibrated.
+**Learned** (`learned.py`, saved trees in `artifacts/learned.joblib`): each candidate pair is the same strictly-later pair the other approaches consider.
+Features are the kinematic gap, straight-line distance, projected miss and its along-track and cross-track parts, miss over a gap allowance fit on train true links, end and start speeds and their difference, heading change, implied straight speed, counts of earlier candidates and earlier plausible candidates, altitude difference, reported speed and heading differences, reported speed versus kinematic speed, whether the reference codes match (placeholder `C0FFEE` ignored), and the low-quality report fraction.
+They do not include the Gaussian cost terms or the baseline ratio.
+A `HistGradientBoostingClassifier` (learning rate 0.08, 200 iterations, depth 4, minimum 20 samples per leaf, L2 0.1, seed 42) is fit on train pairs only, with class weights balancing the 1,364 true links against the other pairs.
+The score is that model's predicted chance the candidate is the immediate next tracklet.
+Greedy best-first selection then accepts a pair only when the score is at least 0.05 and leads the next remaining candidate by at least 0.20; otherwise the tracklet stays unresolved and a worse candidate is not taken in its place.
+One tracklet has at most one successor and one predecessor.
+The learned approach was produced by an AI coding agent as a port of an AI-built reference solution, not designed by the author.
+
+**Scores.** Baseline and Gaussian scores are costs: lower is better and 0 is a perfect fit.
+The learned score is a predicted chance: higher is better.
+None of the scores are calibrated probabilities.
 
 **Constraints.** A target must start strictly after its source ends, so accepted links can never form a cycle.
 Results do not depend on input order or on identical duplicates; tests check both.
@@ -135,7 +155,7 @@ This is an inference from data, not a documented meaning.
 
 ## Known limitations
 
-- No learned approach yet, and so no training command or model artifact. Both approaches are deterministic and configured in code; `GET /health` and every result report the configuration hash. The only randomness is the weight search, seeded (`--seed 0`).
+- The learned score is not a calibrated probability. The service loads `artifacts/learned.joblib` at startup and does not retrain; `GET /health` reports that artifact and its version `learned-1.0.0`. The only randomness elsewhere is the Gaussian weight search, seeded (`--seed 0`).
 - Two weight sets exist for the Gaussian model: `train_hand_tuned` (default, tuned by hand on train) and `validation_search` (random search on validation). The second makes fewer errors on train and test; see REPORT.md. Scales, the velocity window and the no-match cost were set by hand.
 - Lowering the no-match cost removes few wrong links per unresolved link it adds; most remaining wrong links are confident swaps between nearby aircraft. Abstaining when the best and second-best candidates are close would target them better.
 - The `dt` penalty grows with the absolute gap, so it cannot be raised to stop skipped tracklets without also penalising long true gaps.
@@ -201,6 +221,13 @@ uv run python -m aircraft_track_association evaluate candidate-packet/data/train
 uv run python -m aircraft_track_association evaluate candidate-packet/data/validation/scenario_*
 uv run python -m aircraft_track_association evaluate candidate-packet/data/test/scenario_*
 uv run python -m aircraft_track_association evaluate candidate-packet/data/test/scenario_014 --approach gaussian
+uv run python -m aircraft_track_association evaluate candidate-packet/data/test/scenario_* --approach learned
+```
+
+Fit the learned model on train and choose its threshold on validation (this does not read test), writing `artifacts/learned.joblib`:
+
+```bash
+uv run python -m aircraft_track_association train candidate-packet/data/train/scenario_* --validation candidate-packet/data/validation/scenario_*
 ```
 
 Search Gaussian-model weights on validation (prints the best trials; does not edit `weights.py`), and evaluate with a named weight set:
@@ -223,7 +250,7 @@ Start the service and web interface, then open http://127.0.0.1:8000:
 uv run python -m aircraft_track_association serve
 ```
 
-The interface lets a reviewer pick a scenario and run both approaches, see tracklets and accepted links on a longitude/latitude plot, compare baseline and Gaussian decisions against the labels, inspect each tracklet's ranked candidates, measurements, decision reason and original reports, and compare the two staged snapshots.
+The interface lets a reviewer pick a scenario and run all three approaches, see tracklets and accepted links on a longitude/latitude plot, compare decisions against the labels, inspect each tracklet's ranked candidates, measurements, decision reason and original reports, and compare the two staged snapshots.
 
 ## API
 
@@ -262,7 +289,8 @@ It returns:
         "candidates": [{"tracklet_id": "...", "score": 0.0, "measurements": {"...": 0.0}}]
       }
     ],
-    "gaussian": ["same shape"]
+    "gaussian": ["same shape"],
+    "learned": ["same shape; score is a predicted chance, higher is better"]
   }
 }
 ```
@@ -279,6 +307,7 @@ Labels are never read by this endpoint.
   - `io.py` - validation, deduplication, file loading.
   - `track.py` - projection, altitude, near-duplicates, tracklet Gaussians.
   - `baseline.py` - the baseline rule.
+  - `learned.py` - the learned scorer. Tree weights, feature list, field conventions and the chosen threshold are in `artifacts/learned.joblib`.
   - `associate.py`, `weights.py` - the Gaussian continuity model and its named weight sets.
   - `tune.py` - random weight search against labels.
   - `decision.py` - the per-tracklet decision record both approaches return.
@@ -292,5 +321,5 @@ Labels are never read by this endpoint.
 
 ## Status
 
-Done: data preparation, both approaches with per-tracklet decisions and reasons, evaluation on all partitions, a weight search on validation, failure analysis of test scenario 014 (REPORT.md), staged demo with saved results, investigation of the optional fields, backend, web interface and tests.
-Not done: a learned approach and its comparison, and a stress test.
+Done: data preparation, the baseline, the Gaussian model, and the learned approach, each with per-tracklet decisions and reasons; evaluation on all partitions; a Gaussian weight search on validation; failure analysis of test scenario 014 (REPORT.md); staged demo with saved results; investigation of the optional fields; backend, web interface and tests.
+Not done: a stress test, a correlation heatmap of the learned features, and a written review of individual learned errors.

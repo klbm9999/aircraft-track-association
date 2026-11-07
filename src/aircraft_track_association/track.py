@@ -16,7 +16,7 @@ Pipeline for each tracklet:
 """
 
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 from pyproj import Transformer
@@ -47,6 +47,9 @@ class Tracklet:
     start_vel: np.ndarray
     end_pos: np.ndarray  # line fit over the last points, evaluated at t[-1]
     end_vel: np.ndarray
+    # Kept observations, aligned with t and p. The learned approach reads reported
+    # fields from these; the other approaches ignore them.
+    reports: list = field(default_factory=list)
 
 
 def projector(observations: list[dict]) -> Transformer:
@@ -63,7 +66,7 @@ def line_fit(t: np.ndarray, p: np.ndarray, t_ref: float) -> tuple[np.ndarray, np
     return pos, vel
 
 
-def build_tracklet(tid: str, t: np.ndarray, p: np.ndarray) -> Tracklet:
+def build_tracklet(tid: str, t: np.ndarray, p: np.ndarray, reports: list | None = None) -> Tracklet:
     """Fit the position/velocity Gaussians and endpoint states for one cleaned tracklet."""
     # Pair each report with the first report at least MIN_BASELINE_S later, so every velocity
     # sample averages over enough motion to swamp position noise.
@@ -94,6 +97,7 @@ def build_tracklet(tid: str, t: np.ndarray, p: np.ndarray) -> Tracklet:
         start_vel=start_vel,
         end_pos=end_pos,
         end_vel=end_vel,
+        reports=list(reports or []),
     )
 
 
@@ -152,5 +156,5 @@ def build_tracklets(
                 keep.append(i)
         if len(np.unique(t[keep])) < 2:  # contract: a tracklet needs two distinct reports
             raise InputError(f"{tid}: a tracklet needs at least two reports at distinct times")
-        tracklets.append(build_tracklet(tid, t[keep], p[keep]))
+        tracklets.append(build_tracklet(tid, t[keep], p[keep], [obs[i] for i in keep]))
     return sorted(tracklets, key=lambda tr: (tr.t[0], tr.id))

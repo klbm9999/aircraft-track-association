@@ -50,10 +50,10 @@
   .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; min-width: 0; }
   .card h2 { margin: 0 0 8px; font-size: 14px; font-weight: 600; }
   .card h3 { margin: 14px 0 6px; font-size: 13px; font-weight: 600; }
-  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 12px; margin-bottom: 12px; }
   .stat h2 { display: flex; align-items: baseline; gap: 8px; }
   .stat h2 span { color: var(--muted); font-weight: 400; font-size: 12px; }
-  .kv { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+  .kv { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .kv div { background: var(--chip); border-radius: 6px; padding: 6px 8px; }
   .kv b { display: block; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
   .kv small { color: var(--muted); font-size: 11px; }
@@ -88,7 +88,7 @@
 <body>
 <header><div>
   <h1>Aircraft track association</h1>
-  <p>Links each tracklet to its next fragment from the same aircraft, or leaves it unresolved. Two approaches: a constant-velocity baseline and the Gaussian continuity model.</p>
+  <p>Links each tracklet to its next fragment from the same aircraft, or leaves it unresolved. Three approaches: a constant-velocity baseline, the Gaussian continuity model, and a learned score.</p>
 </div></header>
 <main>
   <div class="tabs" role="tablist">
@@ -159,7 +159,12 @@
 </main>
 
 <script>
-const APPROACHES = [["baseline", "Baseline"], ["gaussian", "Gaussian continuity"]];
+const APPROACHES = [["baseline", "Baseline"], ["gaussian", "Gaussian continuity"], ["learned", "Learned"]];
+const SCORE_NOTE = {
+  baseline: "Score is a cost: lower is better. 0 is a perfect speed match.",
+  gaussian: "Score is a cost: lower is better. 0 is a perfect fit.",
+  learned: "Score is the predicted chance this candidate is the immediate next tracklet. Higher is better, and it is not a calibrated probability.",
+};
 const state = { scenarios: [], data: null, result: null, labels: {}, approach: "gaussian",
                 selected: null, staged: null, stagedApproach: "gaussian" };
 const $ = (s) => document.querySelector(s);
@@ -311,14 +316,16 @@ function decisionCell(r, label) {
 function renderDecisions() {
   const { result, labels } = state;
   const rec = Object.fromEntries(APPROACHES.map(([k]) => [k, Object.fromEntries(result.results[k].map((r) => [r.tracklet_id, r]))]));
-  let h = `<thead><tr><th>Tracklet</th><th>Source</th><th>Start (UTC)</th><th class="num">Reports</th><th>Baseline</th><th>Gaussian</th><th>Agree</th><th>Label</th></tr></thead><tbody>`;
+  let h = `<thead><tr><th>Tracklet</th><th>Source</th><th>Start (UTC)</th><th class="num">Reports</th>${
+    APPROACHES.map(([, label]) => `<th>${label}</th>`).join("")}<th>Agree</th><th>Label</th></tr></thead><tbody>`;
   for (const t of result.tracklets) {
-    const b = rec.baseline[t.tracklet_id], g = rec.gaussian[t.tracklet_id], l = labels[t.tracklet_id];
-    const agree = b.successor === g.successor;
+    const rows = APPROACHES.map(([k]) => rec[k][t.tracklet_id]);
+    const l = labels[t.tracklet_id];
+    const agree = rows.every((r) => r.successor === rows[0].successor);
     h += `<tr class="clickable${state.selected === t.tracklet_id ? " selected" : ""}" data-id="${t.tracklet_id}">
       <td><span class="chip" style="background:${state.colourOf[t.tracklet_id]}"></span><span class="id">${short(t.tracklet_id)}</span></td>
       <td>${esc(t.source)}</td><td>${hhmmss(t.start_s)}</td><td class="num">${t.observation_count}</td>
-      <td>${decisionCell(b, l)}</td><td>${decisionCell(g, l)}</td>
+      ${rows.map((r) => `<td>${decisionCell(r, l)}</td>`).join("")}
       <td>${agree ? "yes" : `<span class="badge changed">differ</span>`}</td><td class="id">${l ? short(l) : "none"}</td></tr>`;
   }
   $("#decisions").innerHTML = h + "</tbody>";
@@ -333,13 +340,14 @@ function renderDetail() {
   el.hidden = false;
   const label = state.labels[id];
   let h = `<h2><span class="chip" style="background:${state.colourOf[id]}"></span>Tracklet <span class="id">${esc(id)}</span></h2>
-           <p class="hint">Labelled successor: <span class="id">${label ? esc(short(label)) : "none"}</span>. Scores are costs: lower is better, 0 is a perfect fit; they are not probabilities.</p>`;
+           <p class="hint">Labelled successor: <span class="id">${label ? esc(short(label)) : "none"}</span>. The label is shown for evaluation only; it is never an input.</p>`;
   for (const [k, title] of APPROACHES) {
     const r = state.result.results[k].find((x) => x.tracklet_id === id);
     const names = [...new Set(r.candidates.flatMap((c) => Object.keys(c.measurements)))];
     const vsLabel = !r.successor ? "" : r.successor === label ? `<span class="badge accepted">matches label</span>`
                                                                : `<span class="badge wrong">differs from label</span>`;
     h += `<h3>${title}: <span class="badge ${r.successor ? "neutral" : "unresolved"}">${r.status}</span> ${vsLabel}</h3>
+          <p class="hint">${SCORE_NOTE[k]}</p>
           <p class="reason">${esc(r.reason)}</p>`;
     if (!r.candidates.length) { h += `<p class="hint">No candidates.</p>`; continue; }
     h += `<div class="tablewrap fit"><table><thead><tr><th class="num">#</th><th>Candidate</th><th class="num">Score</th>${names.map((n) => `<th class="num">${esc(n)}</th>`).join("")}<th></th></tr></thead><tbody>`;

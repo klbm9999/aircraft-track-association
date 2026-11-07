@@ -127,13 +127,29 @@ Raw weights are not directly comparable across terms, because the fixed scales d
 ## Validation weight search
 
 The hand-tuned weights above are kept as the weight set `train_hand_tuned`.
-A second set, `validation_search`, was found by random search on the validation partition, as the challenge asks for decision settings (`python -m aircraft_track_association tune candidate-packet/data/validation/scenario_* --trials 2000 --seed 0`, see `tune.py`).
+A second set, `validation_search`, was found by an automated random search on the validation partition, since the challenge asks for decision settings to be selected on validation.
 
-- Each weight is sampled log-uniformly in [0.01, 10], keeping plausibility > vel_w2 > pos_w2.
-- Scales and the no-match cost (1.0) stay fixed, since scaling every weight is equivalent to moving the no-match cost.
-- The objective is 2 x wrong links + unresolved links, so a wrong link counts double.
-- Ties are broken by the larger mean margin between each true link's cost and its best competitor, relative to the no-match cost.
-- Trial 0 is the hand-tuned set, which scores 5 (1 wrong, 3 unresolved) on validation.
+### How the weights were found
+
+Command, deterministic for a given seed (about 13 s):
+
+```bash
+uv run python -m aircraft_track_association tune candidate-packet/data/validation/scenario_* --trials 2000 --seed 0
+```
+
+1. **Precompute.** For each of the 20 validation scenarios, the seven raw cost terms of every candidate pair are computed once and divided by the fixed scales. The terms do not depend on the weights, so each trial only re-weights them.
+2. **Sample.** Trial 0 is the hand-tuned set. Every other trial draws each of the seven weights independently and log-uniformly from [0.01, 10] (seeded NumPy generator), rejecting draws that break the order plausibility > vel_w2 > pos_w2 set at the start of the project.
+3. **Fixed settings.** Scales, the 10 s velocity window, endpoint fits and the no-match cost (1.0) are not searched. Multiplying every weight by a constant is the same as dividing the no-match cost by it, so searching both would be redundant.
+4. **Assign.** For each trial and scenario, the weighted cost matrix goes through the same Hungarian assignment with a no-match option as in production (`associate.assign`).
+5. **Objective.** Each trial is scored on the whole partition as 2 x wrong links + unresolved links, so a wrong link counts twice as much as a withheld one. A wrong link includes a link from a tracklet that has no labelled successor.
+6. **Tie-break.** Among equal objectives, the trial with the largest mean margin wins. The margin of a true link is the cost of the source's cheapest other candidate minus the true link's cost, divided by the no-match cost (capped at 10). A larger margin means the correct choice wins by more, so the set should be less fragile.
+7. **Check.** A test (`test_tune_scoring_matches_evaluation`) confirms the search's wrong and unresolved counts equal the full pipeline's for the same weights.
+
+What the search found:
+
+- 32 of 2000 trials reached objective 0 (no wrong and no unresolved links on validation), and 67 beat the hand-tuned set's objective of 5 (1 wrong, 3 unresolved, mean margin 0.668).
+- The zero-error trials vary widely; for example heading ranges from 0.012 to 2.567 and altitude from 0.047 to 1.875, so validation alone does not pin the weights down.
+- The tie-break picked trial 244 (mean margin 0.959; the next were 0.910 and 0.822).
 
 | Term | train_hand_tuned | validation_search |
 | --- | ---: | ---: |
@@ -222,6 +238,56 @@ Labelled successor `feb43402` was assigned to `3c93ea1c`.
 Reason: _to be added._
 
 Across the chain, the assignment's total for the reported links is 0.438 + 0.317 + 0.384 = 1.139, against 0.237 + 0.558 + 0.353 = 1.148 for the labelled links, so the solver's choice is the cheaper one by 0.009.
+
+## Stress test: thinned reports
+
+Command (`stress.py`), reproducible for a given seed:
+
+```bash
+uv run python -m aircraft_track_association stress candidate-packet/data/test/scenario_* --keep 0.25 --seed 0
+```
+
+Each tracklet keeps a random fraction of its unique reports (at least 3, so every tracklet stays defined), and supporting records of removed reports are dropped.
+The random choice is seeded per tracklet from the seed and the tracklet ID, so it does not depend on file order.
+Tracklets and labels are unchanged, and nothing was retuned.
+
+Single seed (0):
+
+| Approach / weight set | Partition | Reports kept | Correct / true links | Wrong | Unresolved | Precision | Recall |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline | Validation | 100% | 68 / 335 | 139 | 128 | 0.329 | 0.203 |
+| Baseline | Validation | 50% | 95 / 335 | 132 | 108 | 0.419 | 0.284 |
+| Baseline | Validation | 25% | 110 / 335 | 131 | 94 | 0.456 | 0.328 |
+| Baseline | Test | 100% | 64 / 339 | 135 | 140 | 0.322 | 0.189 |
+| Baseline | Test | 50% | 82 / 339 | 142 | 115 | 0.366 | 0.242 |
+| Baseline | Test | 25% | 92 / 339 | 146 | 101 | 0.387 | 0.271 |
+| Gaussian, train_hand_tuned | Validation | 100% | 331 / 335 | 1 | 3 | 0.997 | 0.988 |
+| Gaussian, train_hand_tuned | Validation | 50% | 330 / 335 | 2 | 3 | 0.994 | 0.985 |
+| Gaussian, train_hand_tuned | Validation | 25% | 323 / 335 | 4 | 8 | 0.988 | 0.964 |
+| Gaussian, train_hand_tuned | Test | 100% | 333 / 339 | 4 | 2 | 0.988 | 0.982 |
+| Gaussian, train_hand_tuned | Test | 50% | 331 / 339 | 6 | 2 | 0.982 | 0.976 |
+| Gaussian, train_hand_tuned | Test | 25% | 319 / 339 | 9 | 12 | 0.973 | 0.941 |
+| Gaussian, validation_search | Validation | 100% | 335 / 335 | 0 | 0 | 1.000 | 1.000 |
+| Gaussian, validation_search | Validation | 50% | 333 / 335 | 1 | 1 | 0.997 | 0.994 |
+| Gaussian, validation_search | Validation | 25% | 332 / 335 | 1 | 2 | 0.997 | 0.991 |
+| Gaussian, validation_search | Test | 100% | 337 / 339 | 2 | 0 | 0.994 | 0.994 |
+| Gaussian, validation_search | Test | 50% | 339 / 339 | 0 | 0 | 1.000 | 1.000 |
+| Gaussian, validation_search | Test | 25% | 333 / 339 | 3 | 3 | 0.991 | 0.982 |
+
+Single-seed results move by a few links between seeds (the 50% test run for `validation_search` beats the unthinned run by chance), so the 25% case was repeated with seeds 0-4:
+
+| Gaussian weight set | Partition | Mean correct | Mean wrong | Mean unresolved | Wrong / unresolved per seed |
+| --- | --- | ---: | ---: | ---: | --- |
+| train_hand_tuned | Validation | 322.6 / 335 | 4.2 | 8.2 | 4/8, 3/7, 4/10, 4/10, 6/6 |
+| train_hand_tuned | Test | 321.2 / 339 | 7.6 | 10.4 | 9/12, 11/11, 8/10, 5/9, 5/10 |
+| validation_search | Validation | 333.2 / 335 | 0.6 | 1.2 | 1/2, 1/2, 0/0, 0/0, 1/2 |
+| validation_search | Test | 331.6 / 339 | 4.8 | 2.6 | 3/3, 5/3, 6/3, 3/1, 7/3 |
+
+Findings:
+
+- Keeping a quarter of the reports roughly doubles the Gaussian model's wrong links on test (4 to 7.6 on average for the hand-tuned set, 2 to 4.8 for the searched set), and raises unresolved links more for the hand-tuned set (2 to 10.4) than for the searched set (0 to 2.6).
+- Precision stays above 0.97 for both sets, so fewer reports mostly turn into withheld links rather than wrong ones.
+- The baseline improves under thinning, which was not investigated; a likely cause is that fewer reports leave fewer closely spaced pairs at the end of the source, making its "last speed" less noisy. It still stays below 0.46 precision.
 
 ## Errors
 

@@ -43,6 +43,12 @@ The baseline's precision stays between 0.25 and 0.36 at any tolerance on validat
 
 It checks speed only: any tracklet roughly the right distance away passes, whatever its direction, so with six aircraft per scenario it often picks the wrong one.
 
+### Stress test
+
+Each tracklet is thinned to a random 50% or 25% of its reports (at least 3 kept), supporting records of removed reports are dropped, and both approaches are rerun with no retuning (`stress` command; details in REPORT.md).
+At 25%, averaged over seeds 0-4 on test, the Gaussian model makes 7.6 wrong and 10.4 unresolved links with `train_hand_tuned` (4 and 2 unthinned) and 4.8 wrong and 2.6 unresolved with `validation_search` (2 and 0 unthinned); precision stays above 0.97 for both.
+The baseline improves slightly when thinned (test precision 0.322 to 0.387) but stays far below the Gaussian model.
+
 ### Additional evidence (staged demo)
 
 Snapshot 1 and snapshot 2 are analysed independently with the same settings; saved results are in `results/staged_demo/`.
@@ -136,10 +142,9 @@ This is an inference from data, not a documented meaning.
 ## Known limitations
 
 - No learned approach yet, and so no training command or model artifact. Both approaches are deterministic and configured in code; `GET /health` and every result report the configuration hash. The only randomness is the weight search, seeded (`--seed 0`).
-- Two weight sets exist for the Gaussian model: `train_hand_tuned` (default, tuned by hand on train) and `validation_search` (random search on validation). The second makes fewer errors on train and test; see REPORT.md. Scales, the velocity window and the no-match cost were set by hand.
+- Two weight sets exist for the Gaussian model: `train_hand_tuned` (default, tuned by hand on train) and `validation_search` (seeded random search on validation, 2000 trials, objective 2 x wrong + unresolved, ties broken by margin; details in REPORT.md). The second makes fewer errors on train and test. 32 trials reached zero errors on validation with widely different weights, so validation alone does not pin the weights down. Scales, the velocity window and the no-match cost were set by hand.
 - Lowering the no-match cost removes few wrong links per unresolved link it adds; most remaining wrong links are confident swaps between nearby aircraft. Abstaining when the best and second-best candidates are close would target them better.
 - The `dt` penalty grows with the absolute gap, so it cannot be raised to stop skipped tracklets without also penalising long true gaps.
-- No stress test has been run.
 - Results are on synthetic data with simplified motion and sources; they are not evidence of real-world accuracy.
 
 ## Demonstrations (train scenario_001)
@@ -201,6 +206,12 @@ uv run python -m aircraft_track_association evaluate candidate-packet/data/train
 uv run python -m aircraft_track_association evaluate candidate-packet/data/validation/scenario_*
 uv run python -m aircraft_track_association evaluate candidate-packet/data/test/scenario_*
 uv run python -m aircraft_track_association evaluate candidate-packet/data/test/scenario_014 --approach gaussian
+```
+
+Stress test (thin each tracklet to 25% of its reports, seeded, no retuning):
+
+```bash
+uv run python -m aircraft_track_association stress candidate-packet/data/test/scenario_* --keep 0.25 --seed 0
 ```
 
 Search Gaussian-model weights on validation (prints the best trials; does not edit `weights.py`), and evaluate with a named weight set:
@@ -281,6 +292,7 @@ Labels are never read by this endpoint.
   - `baseline.py` - the baseline rule.
   - `associate.py`, `weights.py` - the Gaussian continuity model and its named weight sets.
   - `tune.py` - random weight search against labels.
+  - `stress.py` - report thinning for the stress test.
   - `decision.py` - the per-tracklet decision record both approaches return.
   - `pipeline.py` - one analysis run, shared by the CLI and the service.
   - `evaluate.py` - link metrics.
@@ -292,5 +304,5 @@ Labels are never read by this endpoint.
 
 ## Status
 
-Done: data preparation, both approaches with per-tracklet decisions and reasons, evaluation on all partitions, a weight search on validation, failure analysis of test scenario 014 (REPORT.md), staged demo with saved results, investigation of the optional fields, backend, web interface and tests.
-Not done: a learned approach and its comparison, and a stress test.
+Done: data preparation, both approaches with per-tracklet decisions and reasons, evaluation on all partitions, a weight search on validation, failure analysis of test scenario 014 (REPORT.md), stress test, staged demo with saved results, investigation of the optional fields, backend, web interface and tests.
+Not done here: the learned approach and its comparison, which are being developed separately.

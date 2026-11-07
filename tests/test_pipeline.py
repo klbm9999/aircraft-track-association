@@ -171,3 +171,19 @@ def test_tune_scoring_matches_evaluation():
         )
         wrong, unresolved = wrong + m["wrong_links"], unresolved + m["unreported_links"]
     assert (s["wrong"], s["unresolved"]) == (wrong, unresolved)
+
+
+def test_thinning_keeps_every_tracklet_and_is_reproducible(snapshot):
+    from collections import Counter
+
+    from aircraft_track_association.stress import MIN_KEEP, thin
+
+    obs, sup = thin(snapshot["observations"], snapshot["supporting"], 0.25, seed=0)
+    before = Counter(o["tracklet_id"] for o in dedupe(snapshot["observations"]))
+    after = Counter(o["tracklet_id"] for o in obs)
+    assert set(after) == set(before)
+    assert all(after[t] >= min(MIN_KEEP, before[t]) for t in before)
+    assert sum(after.values()) < sum(before.values()) / 2
+    assert {r["observation_id"] for r in sup} <= {o["observation_id"] for o in obs}
+    rows = list(reversed(snapshot["observations"]))
+    assert thin(rows, snapshot["supporting"], 0.25, seed=0)[0] == obs  # order-independent

@@ -12,14 +12,14 @@ from pathlib import Path
 
 from .associate import WEIGHTS, cost_matrix, match
 from .evaluate import link_metrics
-from .io import load_observations, load_successors
-from .track import build_tracklets
+from .io import load_successors
+from .track import load_tracklets
 
 COUNTS = ("correct_links", "wrong_links", "unreported_links", "predicted_links", "true_links")
 
 
 def main(scenario_dir: Path) -> None:
-    tracklets = build_tracklets(load_observations(scenario_dir))
+    tracklets = load_tracklets(scenario_dir)
     predicted = match(tracklets)
     truth = load_successors(scenario_dir)  # evaluation only, never an inference input
     m = link_metrics(predicted, truth)
@@ -50,7 +50,7 @@ def main(scenario_dir: Path) -> None:
 def summary(scenario_dirs: list[Path]) -> None:
     totals = dict.fromkeys(COUNTS, 0)
     for d in scenario_dirs:
-        m = link_metrics(match(build_tracklets(load_observations(d))), load_successors(d))
+        m = link_metrics(match(load_tracklets(d)), load_successors(d))
         for k in totals:
             totals[k] += m[k]
         print(

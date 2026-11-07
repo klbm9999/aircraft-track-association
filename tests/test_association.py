@@ -48,6 +48,18 @@ def test_projection_metric_and_altitude_mean_fill():
     assert np.linalg.norm(t.vel_mean[:2]) == pytest.approx(110.9, rel=0.01)
 
 
+def test_supporting_altitude_fills_gap_before_tracklet_mean():
+    rows = [
+        obs(0, "a", 0, 35.0, -108.0),
+        obs(1, "a", 10, 35.01, -108.0, alt=None),
+        obs(2, "a", 20, 35.02, -108.0, alt=None),
+    ]
+    (t,) = build_tracklets(rows, {"oa1": 5000.0})
+    assert t.p[1, 2] == pytest.approx(5000.0)
+    # oa2 has no supporting altitude: mean of the reported and supporting values
+    assert t.p[2, 2] == pytest.approx((10000 * 0.3048 + 5000.0) / 2)
+
+
 def test_near_duplicate_dropped():
     rows = [
         obs(0, "a", 0, 35.0, -108.0),
@@ -100,8 +112,9 @@ def test_link_metrics():
 
 
 def test_scenario_001_regression():
-    from aircraft_track_association.io import load_observations, load_successors
+    from aircraft_track_association.io import load_successors
+    from aircraft_track_association.track import load_tracklets
 
     d = PACKET / "data/train/scenario_001"
-    m = link_metrics(match(build_tracklets(load_observations(d))), load_successors(d))
+    m = link_metrics(match(load_tracklets(d)), load_successors(d))
     assert m["f1"] == 1.0

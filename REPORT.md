@@ -23,7 +23,7 @@ A true link lost because its source got a wrong link is counted once, as wrong.
 Each scenario is processed independently, and labels are read only for scoring.
 
 1. **Load.** Identical retransmissions are collapsed by `observation_id`. Conflicting reports that share an ID, out-of-range coordinates and missing required fields raise an error.
-2. **Project.** Positions go from EPSG:4326 to a local azimuthal equidistant plane centred on the scenario, in metres. EPSG:3857 was rejected because it inflates distances by about 22% at 35N. Altitude is converted from feet to metres, and missing values take the tracklet mean.
+2. **Project.** Positions go from EPSG:4326 to a local azimuthal equidistant plane centred on the scenario, in metres. EPSG:3857 was rejected because it inflates distances by about 22% at 35N. Altitude is converted from feet to metres; missing values come from the supporting record's `a1` field, then the tracklet mean.
 3. **Near-duplicates.** Within a tracklet, a report from the same feed within 0.5 s and 50 m of the previous kept report is dropped.
 4. **Tracklet model.** Each tracklet gets a 3D position Gaussian and a 3D velocity Gaussian. Velocity samples span at least 10 s, because position noise of about 200 m over sub-second report gaps otherwise produces velocities above 500 m/s. Start and end states come from straight-line fits over the first and last 6 reports.
 5. **Pair costs.** Every source -> target pair where the target starts after the source ends is scored. Pairs that overlap in time get infinite cost. Each term is divided by a fixed scale and weighted:
@@ -109,7 +109,11 @@ The weakest train scenarios are 017 (F1 0.727), 046 (0.750) and 053 (0.800). The
 - The no-match cost is barely exercised: the last tracklet of each aircraft has no later candidates, so it is correctly left unlinked because nothing starts after it ends.
 - Plausibility compares only distances. Direction comes in through the heading cosine on mean positions, not through a miss distance at the predicted point.
 - Velocity covariance still reflects feed noise more than aircraft motion, which is why the velocity Wasserstein weight had to be cut.
-- Optional `attributes` and `supporting.jsonl` are not used.
+- Supporting `a1` is used only to fill missing altitude, and other optional `attributes` and supporting fields are not used.
+  `a1` is undocumented and read as altitude in metres: on 10,194 train observations that also report `altitude_ft`, it agrees with `altitude_ft * 0.3048` with correlation 0.999, median ratio 1.000 and at most 162 m difference.
+  It fills 54% of missing altitudes (3,712 of 6,875 across train and validation) but changes no prediction in any partition.
+  The cost barely uses altitude: it enters only through the position Wasserstein term, whose 56 km scale makes 1 km of altitude worth about 0.0005.
+  Altitude still carries signal: true links never differ by more than 226 m in mean altitude, while 6 of the 28 wrong links on train 012-080 and validation join tracklets more than 500 m apart.
 - The staged-demo snapshots and the test partition have not been run.
 
 ## Reproduce

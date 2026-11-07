@@ -4,7 +4,8 @@ Pipeline for each tracklet:
 1. Project latitude/longitude (EPSG:4326) to a local azimuthal equidistant plane centred on the
    scenario. Distances stay true to within metres over the ~100 km scenario extent; EPSG:3857
    would inflate them by 1/cos(lat), about 22% at 35N.
-2. Convert altitude from feet to metres, filling missing values with the tracklet mean.
+2. Altitude in metres: altitude_ft * 0.3048 when reported, else the supporting record's `a1`
+   (altitude in metres, see io.load_supporting_altitude), else the tracklet mean.
 3. Sort by observation time and drop near-duplicate reports.
 4. Summarise the tracklet as:
    - a 3D position Gaussian (mean, covariance) over its reports,
@@ -19,7 +20,7 @@ from dataclasses import dataclass
 import numpy as np
 from pyproj import Transformer
 
-from .io import parse_time
+from .io import load_observations, load_supporting_altitude, parse_time
 
 FT_TO_M = 0.3048
 DUP_DT_S = 0.5  # near-duplicate: same tracklet and feed, closer than this in time...
@@ -91,11 +92,27 @@ def build_tracklet(tid: str, t: np.ndarray, p: np.ndarray) -> Tracklet:
     )
 
 
-def build_tracklets(observations: list[dict]) -> list[Tracklet]:
+def load_tracklets(scenario_dir, use_supporting: bool = True) -> list[Tracklet]:
+    """Read a scenario directory and build its Tracklet models."""
+    support = load_supporting_altitude(scenario_dir) if use_supporting else {}
+    return build_tracklets(load_observations(scenario_dir), support)
+
+
+def altitude_m(obs: dict, support_alt_m: dict[str, float]) -> float | None:
+    """Reported altitude in metres, falling back to the supporting record's altitude."""
+    if obs.get("altitude_ft") is not None:
+        return FT_TO_M * obs["altitude_ft"]
+    return support_alt_m.get(obs["observation_id"])
+
+
+def build_tracklets(
+    observations: list[dict], support_alt_m: dict[str, float] | None = None
+) -> list[Tracklet]:
     """Group a scenario's (already ID-deduplicated) observations into Tracklet models."""
+    support_alt_m = support_alt_m or {}
     to_m = projector(observations)
     # Fallback only for a tracklet with no altitude at all; none occur in the packaged data.
-    alts = [o["altitude_ft"] for o in observations if o.get("altitude_ft") is not None]
+    alts = [a for o in observations if (a := altitude_m(o, support_alt_m)) is not None]
     scenario_alt = float(np.mean(alts)) if alts else 0.0
 
     groups: dict[str, list[dict]] = defaultdict(list)
@@ -106,15 +123,13 @@ def build_tracklets(observations: list[dict]) -> list[Tracklet]:
     for tid, obs in groups.items():
         obs.sort(key=lambda o: parse_time(o["observed_at"]))  # file order is not time order
 
-        # Metric coordinates: x east, y north, z altitude (missing -> tracklet mean).
-        present = [o["altitude_ft"] for o in obs if o.get("altitude_ft") is not None]
+        # Metric coordinates: x east, y north, z altitude (still missing -> tracklet mean).
+        z = [altitude_m(o, support_alt_m) for o in obs]
+        present = [a for a in z if a is not None]
         mean_alt = float(np.mean(present)) if present else scenario_alt
+        z = [mean_alt if a is None else a for a in z]
         t = np.array([parse_time(o["observed_at"]) for o in obs])
         x, y = to_m.transform([o["longitude"] for o in obs], [o["latitude"] for o in obs])
-        z = [
-            FT_TO_M * (o["altitude_ft"] if o.get("altitude_ft") is not None else mean_alt)
-            for o in obs
-        ]
         p = np.column_stack([x, y, z])
 
         # Drop a report that repeats the last kept one from the same feed in time and space.

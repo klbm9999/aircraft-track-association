@@ -1,0 +1,6 @@
+[project]
+name = "aircraft-track-association"
+version = "0.1.0"
+description = "Aircraft track association take-home"
+requires-python = ">=3.12"
+dependencies = []

@@ -13,7 +13,7 @@ import json
 from importlib.metadata import version
 from pathlib import Path
 
-from . import associate, baseline, track, weights
+from . import associate, baseline, learned, track, weights
 from .io import (
     InputError,
     check_utc,
@@ -25,7 +25,11 @@ from .io import (
 )
 
 MODEL_VERSION = version("aircraft-track-association")
-APPROACHES = {"baseline": baseline.decide, "gaussian": associate.decide}
+APPROACHES = {
+    "baseline": baseline.decide,
+    "gaussian": associate.decide,
+    "learned": learned.decide,
+}
 
 
 def config() -> dict:
@@ -46,6 +50,22 @@ def config() -> dict:
             "scales": weights.SCALES,
             "no_match_cost": weights.NO_MATCH_COST,
         },
+        "learned": _learned_config(),
+    }
+
+
+def _learned_config() -> dict:
+    spec = learned.model()
+    operating = spec["decision"]["operating"]
+    return {
+        "artifact": learned.ARTIFACT_NAME,
+        "model_version": spec["model_version"],
+        "feature_set": spec["feature_set"],
+        "feature_names": spec["feature_names"],
+        "min_score": operating["min_score"],
+        "min_margin": operating["min_margin"],
+        "mode": operating["mode"],
+        "seed": spec["seed"],
     }
 
 

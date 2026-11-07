@@ -72,17 +72,22 @@ def result(snapshot):
 
 
 def test_reordered_and_duplicated_input_gives_identical_result(snapshot, result):
+    """Every approach, including learned, is invariant to order and identical duplicates."""
     rows = snapshot["observations"] + snapshot["observations"][:40]
     sup = snapshot["supporting"] + snapshot["supporting"][:20]
     random.Random(7).shuffle(rows)
     random.Random(8).shuffle(sup)
     again = analyze(rows, sup, snapshot["snapshot_id"], snapshot["receipt_cutoff"])
+    assert again["results"]["learned"] == result["results"]["learned"]
     assert again["results"] == result["results"]
     assert again["input_sha256"] == result["input_sha256"]
 
 
-@pytest.mark.parametrize("approach", ["baseline", "gaussian"])
-def test_association_constraints(result, approach):
+@pytest.mark.parametrize(
+    ("approach", "higher_is_better"),
+    [("baseline", False), ("gaussian", False), ("learned", True)],
+)
+def test_association_constraints(result, approach, higher_is_better):
     start = {t["tracklet_id"]: t["start_s"] for t in result["tracklets"]}
     end = {t["tracklet_id"]: t["end_s"] for t in result["tracklets"]}
     linked = links(result["results"][approach])
@@ -93,7 +98,7 @@ def test_association_constraints(result, approach):
         assert (r["status"] == "accepted") == (r["successor"] is not None)
         assert r["reason"]
         scores = [c["score"] for c in r["candidates"]]
-        assert scores == sorted(scores)
+        assert scores == sorted(scores, reverse=higher_is_better)
 
 
 def test_receipt_cutoff_releases_only_earlier_records():
@@ -129,7 +134,10 @@ client = TestClient(app)
 
 def test_health():
     body = client.get("/health").json()
-    assert body["status"] == "ok" and body["approaches"] == ["baseline", "gaussian"]
+    assert body["status"] == "ok"
+    assert body["approaches"] == ["baseline", "gaussian", "learned"]
+    assert body["learned_model"]["artifact"] == "artifacts/learned.joblib"
+    assert body["learned_model"]["version"]
 
 
 def test_associate_endpoint_matches_pipeline(snapshot, result):

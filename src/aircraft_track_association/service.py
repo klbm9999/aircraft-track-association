@@ -18,6 +18,7 @@ import json
 import logging
 import os
 import re
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +28,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 from starlette.exceptions import HTTPException
 
+from . import learned
 from .io import InputError, read_jsonl
 from .pipeline import APPROACHES, MODEL_VERSION, analyze, config, digest, read_snapshot
 
@@ -39,7 +41,15 @@ PARTITIONS = ("train", "validation", "test", "staged_demo")
 NAME = re.compile(r"^[A-Za-z0-9_]+$")
 MAX_RECORDS = 200_000  # far above any packaged scenario; bounds a single request's work
 
-app = FastAPI(title="Aircraft track association", version=MODEL_VERSION)
+
+@asynccontextmanager
+async def _lifespan(_app):
+    # Load the saved trees at startup. associate() never refits them.
+    learned.model()
+    yield
+
+
+app = FastAPI(title="Aircraft track association", version=MODEL_VERSION, lifespan=_lifespan)
 
 
 class AssociateRequest(BaseModel):
@@ -83,12 +93,14 @@ async def unexpected_error(_: Request, exc: Exception):
 
 @app.get("/health")
 def health() -> dict:
+    spec = learned.model()
     return {
         "status": "ok",
         "model_version": MODEL_VERSION,
         "approaches": list(APPROACHES),
         "config_sha256": digest(config()),
         "scenarios_available": DATA_DIR.is_dir(),
+        "learned_model": {"artifact": learned.ARTIFACT_NAME, "version": spec["model_version"]},
     }
 
 

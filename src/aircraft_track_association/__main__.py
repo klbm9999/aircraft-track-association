@@ -4,6 +4,8 @@
     python -m aircraft_track_association analyze <scenario_dir> [-o result.json]
     python -m aircraft_track_association stress <scenario_dir> [...] [--keep 0.5] [--seed 0]
     python -m aircraft_track_association tune <scenario_dir> [...] [--trials 2000] [--seed 0]
+    python -m aircraft_track_association train <train_dir> [...] --validation <val_dir> [...]
+    python -m aircraft_track_association correlate <train_dir> [...] [-o heatmap.png]
     python -m aircraft_track_association serve [--host 127.0.0.1] [--port 8000]
 
 evaluate: run association and score it against labels. With one directory it also prints,
@@ -15,6 +17,9 @@ stress: evaluate after thinning each tracklet to a fraction of its reports (see 
     with the same settings and no retuning.
 tune: random search for Gaussian-model weights against labels (see tune.py); prints the best
     trials. It does not change weights.py.
+train: fit the learned model on train and choose its thresholds on validation. It does not
+    read test.
+correlate: write a heatmap of the correlation between the learned training features.
 serve: start the HTTP service and web interface.
 """
 
@@ -102,6 +107,13 @@ def main() -> None:
     tu.add_argument("scenario_dirs", nargs="+", type=Path)
     tu.add_argument("--trials", type=int, default=2000)
     tu.add_argument("--seed", type=int, default=0)
+    tr = sub.add_parser("train", help="fit the learned model; does not read test")
+    tr.add_argument("train_dirs", nargs="+", type=Path)
+    tr.add_argument("--validation", nargs="+", required=True, type=Path)
+    tr.add_argument("-o", "--output", type=Path)
+    co = sub.add_parser("correlate", help="heatmap of learned training-feature correlations")
+    co.add_argument("train_dirs", nargs="+", type=Path)
+    co.add_argument("-o", "--output", type=Path)
     sv = sub.add_parser("serve", help="start the HTTP service and web interface")
     sv.add_argument("--host", default="127.0.0.1")
     sv.add_argument("--port", type=int, default=8000)
@@ -137,6 +149,14 @@ def main() -> None:
         current = next(r for r in best if r["trial"] == 0)
         print(f"current weights: objective {current['objective']}, margin {current['margin']:.3f}")
         print("best weights:", json.dumps({k: round(v, 4) for k, v in best[0]["weights"].items()}))
+    elif args.command == "train":
+        from .learned import train
+
+        train(args.train_dirs, args.validation, args.output)
+    elif args.command == "correlate":
+        from .learned import correlate
+
+        correlate(args.train_dirs, args.output)
     else:
         import uvicorn
 

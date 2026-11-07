@@ -1,0 +1,156 @@
+{
+  "model_version": "learned-1.0.0",
+  "feature_set": "kinematic_altitude_reported",
+  "feature_names": [
+    "gap_s",
+    "straight_km",
+    "miss_km",
+    "along_miss_km",
+    "cross_miss_km",
+    "miss_over_allowance",
+    "speed_a_mps",
+    "speed_b_mps",
+    "speed_abs_diff_mps",
+    "heading_delta_deg",
+    "straight_speed_mps",
+    "n_earlier_candidates",
+    "n_earlier_plausible",
+    "altitude_abs_diff_ft",
+    "reported_speed_abs_diff_mps",
+    "reported_heading_delta_deg",
+    "reported_vs_kinematic_mps",
+    "ref_match",
+    "low_quality_fraction"
+  ],
+  "dropped_features": [
+    "altitude_missing_count"
+  ],
+  "seed": 42,
+  "hyperparameters": {
+    "learning_rate": 0.08,
+    "max_iter": 200,
+    "max_depth": 4,
+    "min_samples_leaf": 20,
+    "l2_regularization": 0.1
+  },
+  "conventions": {
+    "speed_units": {
+      "feed-a": {
+        "field": "spd",
+        "unit": "knots",
+        "to_mps": 0.514444,
+        "status": "documented_and_confirmed"
+      },
+      "feed-b": {
+        "field": "spd",
+        "unit": "metres_per_second",
+        "to_mps": 1.0,
+        "status": "inferred"
+      },
+      "feed-c": {
+        "field": "v",
+        "unit": "kilometres_per_hour",
+        "to_mps": 0.2777777777777778,
+        "status": "inferred"
+      }
+    },
+    "heading_fields": {
+      "feed-a": "crs",
+      "feed-b": "c2",
+      "feed-c": "hdg"
+    },
+    "reference_fields": {
+      "feed-a": "ref",
+      "feed-b": "ref",
+      "feed-c": "tag"
+    },
+    "ignored_references": [
+      "C0FFEE"
+    ],
+    "low_quality_values": {
+      "feed-a": [
+        "0"
+      ],
+      "feed-b": [
+        "3"
+      ],
+      "feed-c": [
+        "L"
+      ]
+    },
+    "telemetry_altitude_field": "a1",
+    "telemetry_metres_to_feet": 3.280839895013123,
+    "ignored_rule": "A reference value is ignored when it accounts for at least 5% of reference-bearing train reports."
+  },
+  "allowance": {
+    "floor_km": 1.0,
+    "per_s_km": 0.004230104036730592,
+    "rule": "allowance_km = max(0.5, floor_km + per_s_km * gap_s), fit on train true links only"
+  },
+  "plausible_allowance_factor": 1.25,
+  "train_pairs": 15912,
+  "train_positives": 1364,
+  "train_candidate_recall": {
+    "retained": 1364,
+    "labeled_links": 1364,
+    "recall": 1.0
+  },
+  "validation_candidate_recall": {
+    "retained": 335,
+    "labeled_links": 335,
+    "recall": 1.0
+  },
+  "decision": {
+    "operating": {
+      "mode": "greedy",
+      "min_score": 0.05,
+      "min_margin": 0.2
+    },
+    "permissive": {
+      "mode": "greedy",
+      "min_score": 0.05,
+      "min_margin": 0.0
+    },
+    "conservative": {
+      "mode": "mutual",
+      "min_score": 0.05,
+      "min_margin": 0.0
+    },
+    "precision_target_met": {
+      "operating": true,
+      "permissive": true,
+      "conservative": true
+    },
+    "validation_metrics": {
+      "operating": {
+        "precision": 1.0,
+        "recall": 0.9761194029850746,
+        "correct": 327,
+        "wrong": 0,
+        "unresolved": 8,
+        "accepted": 327,
+        "true_links": 335
+      },
+      "permissive": {
+        "precision": 0.9969418960244648,
+        "recall": 0.9731343283582089,
+        "correct": 326,
+        "wrong": 1,
+        "unresolved": 8,
+        "accepted": 327,
+        "true_links": 335
+      },
+      "conservative": {
+        "precision": 0.9969418960244648,
+        "recall": 0.9731343283582089,
+        "correct": 326,
+        "wrong": 1,
+        "unresolved": 8,
+        "accepted": 327,
+        "true_links": 335
+      }
+    },
+    "rule": "Operating point maximises validation recall among greedy settings with precision >= 0.95. Ties prefer a larger margin, then a higher minimum score. Permissive is greedy with margin 0 and precision >= 0.85. Conservative is mutual-best with precision >= 0.98."
+  },
+  "protocol": "Fit on train candidate pairs. Thresholds chosen on validation. Test labels were not read by this command."
+}

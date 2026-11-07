@@ -5,8 +5,10 @@ description = "Aircraft track association take-home"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.162.1",
+    "joblib>=1.6.0",
     "numpy>=2.5.4",
     "pyproj>=3.8.0",
+    "scikit-learn>=1.9.1",
     "scipy>=1.18.1",
     "uvicorn>=0.54.0",
 ]
@@ -22,6 +24,7 @@ extend-exclude = ["candidate-packet"]
 [dependency-groups]
 dev = [
     "httpx>=0.28.1",
+    "matplotlib>=3.11.2",
     "pytest>=9.2.0",
     "ruff>=0.17.4",
 ]

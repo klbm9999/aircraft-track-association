@@ -1,6 +1,6 @@
 """Link each tracklet to at most one successor with a cost matrix and Hungarian assignment.
 
-For every ordered pair (source, target) where the target starts after the source ends, six
+For every ordered pair (source, target) where the target starts after the source ends, seven
 cost terms are computed, each divided by a fixed scale and weighted (both set in weights.py).
 Pairs that overlap or run backwards in time get infinite cost. A Hungarian solve over an
 augmented matrix then picks a one-to-one set of links: each source either takes one target
@@ -45,12 +45,14 @@ def pair_terms(src: Tracklet, dst: Tracklet) -> dict[str, float] | None:
     actual = np.linalg.norm(dst.start_pos - src.end_pos)
     return {
         "plausibility": abs(np.log(actual / projected)),
-        # Is the target ahead of the source along its direction of travel?
-        "heading": one_minus_cos(src.vel_mean, dst.pos_mean - src.pos_mean),
+        # Is the target ahead of the source along its (horizontal) direction of travel?
+        "heading": one_minus_cos(src.vel_mean[:2], dst.pos_mean - src.pos_mean),
         # Are both tracklets flying the same way?
         "vel_cos": one_minus_cos(src.vel_mean, dst.vel_mean),
         "vel_w2": wasserstein2(src.vel_mean, src.vel_cov, dst.vel_mean, dst.vel_cov),
         "pos_w2": wasserstein2(src.pos_mean, src.pos_cov, dst.pos_mean, dst.pos_cov),
+        # 1D W2 between altitude Gaussians: sqrt(mean gap^2 + std gap^2)
+        "alt_w2": float(np.hypot(src.alt_mean - dst.alt_mean, src.alt_std - dst.alt_std)),
         "dt": dt,
     }
 

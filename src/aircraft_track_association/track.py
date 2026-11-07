@@ -8,7 +8,8 @@ Pipeline for each tracklet:
    (altitude in metres, see io.load_supporting_altitude), else the tracklet mean.
 3. Sort by observation time and drop near-duplicate reports.
 4. Summarise the tracklet as:
-   - a 3D position Gaussian (mean, covariance) over its reports,
+   - a 2D horizontal position Gaussian (mean, covariance of x, y) over its reports,
+   - a 1D altitude Gaussian (mean, standard deviation of z) over its reports,
    - a 3D velocity Gaussian over velocity samples spanning at least MIN_BASELINE_S,
    - start and end states (position, velocity) from straight-line fits at each end, used to
      project the aircraft across the gap to a candidate successor.
@@ -36,8 +37,10 @@ class Tracklet:
     id: str
     t: np.ndarray  # (n,) seconds, sorted
     p: np.ndarray  # (n, 3) metres: east, north, altitude
-    pos_mean: np.ndarray  # (3,) position Gaussian
-    pos_cov: np.ndarray  # (3, 3)
+    pos_mean: np.ndarray  # (2,) horizontal position Gaussian, x and y only
+    pos_cov: np.ndarray  # (2, 2)
+    alt_mean: float  # altitude Gaussian, metres
+    alt_std: float
     vel_mean: np.ndarray  # (3,) velocity Gaussian, m/s
     vel_cov: np.ndarray  # (3, 3)
     start_pos: np.ndarray  # line fit over the first points, evaluated at t[0]
@@ -81,8 +84,10 @@ def build_tracklet(tid: str, t: np.ndarray, p: np.ndarray) -> Tracklet:
         id=tid,
         t=t,
         p=p,
-        pos_mean=p.mean(0),
-        pos_cov=np.cov(p.T),
+        pos_mean=p[:, :2].mean(0),
+        pos_cov=np.cov(p[:, :2].T),
+        alt_mean=float(p[:, 2].mean()),
+        alt_std=float(p[:, 2].std(ddof=1)),
         vel_mean=v.mean(0),
         vel_cov=vel_cov,
         start_pos=start_pos,

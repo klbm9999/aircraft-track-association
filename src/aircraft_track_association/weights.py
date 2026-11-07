@@ -13,16 +13,18 @@ SCALES = {
     "vel_cos": 0.005,
     "vel_w2": 36.0,  # m/s
     "pos_w2": 56_000.0,  # m
+    "alt_w2": 700.0,  # m
     "dt": 225.0,  # s
 }
-# Tuned by hand on train scenarios 002-011 (see REPORT.md). Heading carries the most weight
-# because it separates aircraft flying in parallel, where the other terms nearly tie.
+# Tuned by hand on train scenarios 002-011 (see REPORT.md). Heading and altitude separate
+# aircraft flying in parallel, where the other terms nearly tie.
 WEIGHTS = {
     "plausibility": 0.35,  # |log(actual gap / projected gap)|
     "heading": 3.0,  # 1 - cos(source mean velocity, source->target mean position offset)
     "vel_cos": 0.15,  # 1 - cos(source mean velocity, target mean velocity)
     "vel_w2": 0.05,  # Wasserstein-2 between velocity Gaussians
-    "pos_w2": 0.03,  # Wasserstein-2 between position Gaussians
+    "pos_w2": 0.03,  # Wasserstein-2 between horizontal position Gaussians
+    "alt_w2": 0.3,  # Wasserstein-2 between altitude Gaussians
     "dt": 0.15,  # gap length, so a link that skips an intermediate tracklet costs more
 }
 NO_MATCH_COST = 1.0  # a pair is linked only if its weighted cost is below this

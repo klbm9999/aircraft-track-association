@@ -45,5 +45,5 @@ I directed the work, made the design decisions, and reviewed and validated the r
 
 ## Prompt log
 
-All prompts submitted to AI tools for this assessment, including follow-ups, are in the repo.
+All prompts submitted to AI tools for this assessment, including follow-ups, are in the repo under `ai-prompts/` (the main Claude Code session is `ai-prompts/claude-code-main-session.md`).
 No credentials or unrelated private information are included.

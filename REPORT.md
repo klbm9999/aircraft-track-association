@@ -6,14 +6,17 @@ A hand-tuned heuristic links tracklets with micro F1 0.988 on validation and 0.9
 No tracklet without a labelled successor was ever given one, in any partition.
 The test partition has not been run.
 
-| Partition | Scenarios | True links | Predicted | Correct | Precision | Recall | F1 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Train, used for tuning (001-011) | 11 | 186 | 184 | 178 | 0.967 | 0.957 | 0.962 |
-| Train, not used for tuning (012-080) | 69 | 1178 | 1164 | 1139 | 0.979 | 0.967 | 0.973 |
-| Train, all | 80 | 1364 | 1348 | 1317 | 0.977 | 0.966 | 0.971 |
-| Validation | 20 | 335 | 333 | 330 | 0.991 | 0.985 | 0.988 |
+| Partition | Scenarios | True links | Correct | Wrong | Unreported | Precision | Recall | F1 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Train, used for tuning (001-011) | 11 | 186 | 178 | 6 | 2 | 0.967 | 0.957 | 0.962 |
+| Train, not used for tuning (012-080) | 69 | 1178 | 1139 | 25 | 14 | 0.979 | 0.967 | 0.973 |
+| Train, all | 80 | 1364 | 1317 | 31 | 16 | 0.977 | 0.966 | 0.971 |
+| Validation | 20 | 335 | 330 | 3 | 2 | 0.991 | 0.985 | 0.988 |
 
 Metrics count exact directed successor links, micro-averaged over scenarios.
+"Wrong" is a reported link that is not the labelled successor.
+"Unreported" is a labelled link whose source was left with no link at all.
+A true link lost because its source got a wrong link is counted once, as wrong.
 
 ## Method
 
@@ -38,10 +41,17 @@ Each scenario is processed independently, and labels are read only for scoring.
 
 Scales are roughly the medians of each term over scenario_001's candidate pairs. They are fixed, so a cost means the same thing in every scenario.
 
-## Tuning log
+## Tuning strategy
 
-Weights were tuned by hand on train scenarios 002-011, with at most 3 iterations allowed.
-The stopping bar was micro F1 of at least 0.95 on those 10 scenarios.
+Tuning was manual and diagnostic-driven, not a search.
+Each iteration ran the 10 tuning scenarios (train 002-011), printed the cost terms of the predicted and true successor for every miss, and changed the weights to fix the pattern that explained the most misses.
+At most 3 iterations were allowed, and the stopping bar was micro F1 of at least 0.95 on those same 10 scenarios.
+The objective was F1, which counts a wrong link and an unreported link as equally bad.
+No grid or random search, cross-validation or held-out tuning split was used.
+The scales and the 10 s velocity window were set earlier from scenario_001 alone.
+Train 012-080 and validation played no part in any choice, so they are the fair estimates.
+
+## Tuning log
 
 | Run | plaus | heading | vel_cos | vel_w2 | pos_w2 | dt | Micro F1 (002-011) |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -70,6 +80,27 @@ Raw weights are not directly comparable across terms, because the fixed scales d
 | Validation | 2 | 1 | 2 | 0 |
 
 Linking to the wrong aircraft is the main error mode.
+
+### Wrong versus unreported links
+
+A wrong link asserts a false identity, so it is worse than leaving a true link unreported.
+The current weights make more wrong links than unreported ones in every partition: 25 vs 14 on train 012-080, and 3 vs 2 on validation.
+
+The obvious lever is the no-match cost: lower it and the solver abstains more often.
+The sweep below shows it does not remove wrong links efficiently.
+
+| No-match cost | Train 012-080 wrong | Train 012-080 unreported | Validation wrong | Validation unreported |
+| ---: | ---: | ---: | ---: | ---: |
+| 1.0 (current) | 25 | 14 | 3 | 2 |
+| 0.5 | 26 | 49 | 6 | 10 |
+| 0.3 | 18 | 162 | 3 | 42 |
+| 0.2 | 10 | 355 | 1 | 111 |
+
+Cutting wrong links on train 012-080 from 25 to 18 costs 148 extra unreported links.
+At 0.5, wrong links even rise on validation, because dropping some links lets the assignment reshuffle others.
+Most wrong links are confident swaps between parallel aircraft: their absolute cost is as low as a true link's.
+A better abstention signal would be ambiguity, for example the margin between a source's best and second-best candidate, rather than absolute cost.
+This sweep is a report, not a tuning step, and the no-match cost stays at 1.0.
 The weakest train scenarios are 017 (F1 0.727), 046 (0.750) and 053 (0.800). They have not been inspected yet.
 
 ## Limitations

@@ -94,6 +94,9 @@ def test_no_match_when_target_is_implausible():
 def test_link_metrics():
     m = link_metrics({"a": "b", "b": "x"}, {"a": "b", "b": "c", "c": None})
     assert (m["precision"], m["recall"], m["correct_no_successor"]) == (0.5, 0.5, 1)
+    assert (m["wrong_links"], m["unreported_links"]) == (1, 0)
+    m = link_metrics({"a": "b"}, {"a": "b", "b": "c", "c": None})
+    assert (m["wrong_links"], m["unreported_links"]) == (0, 1)
 
 
 def test_scenario_001_regression():

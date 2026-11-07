@@ -1,4 +1,13 @@
-"""Exact directed successor-link metrics."""
+"""Score predicted successor links against labels, counting exact directed links only.
+
+A predicted link is correct only if it names the labelled immediate successor; a link to a
+later tracklet of the same aircraft (skipping one) is wrong. Two kinds of error are kept apart
+because they do not cost the same: a wrong link asserts a false identity, while an unreported
+link only withholds a true one.
+- wrong: predicted links that are not the labelled successor (false positives).
+- unreported: labelled links whose source got no prediction at all (abstentions).
+A true link can also be lost because its source was given a wrong link; that counts as wrong.
+"""
 
 
 def link_metrics(predicted: dict[str, str], truth: dict[str, str | None]) -> dict[str, float]:
@@ -13,6 +22,8 @@ def link_metrics(predicted: dict[str, str], truth: dict[str, str | None]) -> dic
         "true_links": len(true),
         "predicted_links": len(pred),
         "correct_links": tp,
+        "wrong_links": len(pred) - tp,
+        "unreported_links": sum(s not in predicted for s, _ in true),
         "precision": precision,
         "recall": recall,
         "f1": f1,

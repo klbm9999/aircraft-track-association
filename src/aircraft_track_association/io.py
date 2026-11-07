@@ -1,4 +1,10 @@
-"""Load scenario files, validate observations and drop identical retransmissions."""
+"""Read scenario files, validate observations and drop identical retransmissions.
+
+This is the trust boundary: every observation is checked for required fields and valid
+coordinates before it reaches modelling. Retransmissions reuse their observation_id, so
+identical rows are collapsed to one, while two different rows sharing an ID are an error.
+Labels are loaded separately and are only ever used for evaluation.
+"""
 
 import json
 from datetime import datetime
@@ -20,6 +26,7 @@ def read_jsonl(path: Path) -> list[dict]:
 
 
 def parse_time(value: str) -> float:
+    """ISO 8601 UTC timestamp (with Z) -> POSIX seconds."""
     return datetime.fromisoformat(value).timestamp()
 
 
@@ -47,6 +54,7 @@ def load_observations(scenario_dir: Path) -> list[dict]:
 
 
 def load_successors(scenario_dir: Path) -> dict[str, str | None]:
+    """Ground truth {tracklet id: successor id or None}. Evaluation only."""
     return {
         r["tracklet_id"]: r["successor_tracklet_id"]
         for r in read_jsonl(scenario_dir / "labels.jsonl")

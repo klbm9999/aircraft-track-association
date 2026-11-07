@@ -5,7 +5,24 @@
 A hand-tuned heuristic links tracklets with micro F1 0.993 on validation and 0.985 on the 69 train scenarios that played no part in tuning.
 It makes 1 wrong link on validation and 11 on held-out train.
 No tracklet without a labelled successor was ever given one, in any partition.
-The test partition has not been run.
+
+## Final results (frozen method)
+
+The method and every setting were frozen at commit 5efa814 before the test labels were read for the first time.
+No change was made after seeing test results.
+
+| Partition | Scenarios | True links | Accepted | Correct | Wrong | Unresolved | Precision | Recall | F1 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Train | 80 | 1364 | 1349 | 1337 | 12 | 15 (1.1%) | 0.991 | 0.980 | 0.986 |
+| Validation | 20 | 335 | 332 | 331 | 1 | 3 (0.9%) | 0.997 | 0.988 | 0.993 |
+| Test | 20 | 339 | 337 | 333 | 4 | 2 (0.6%) | 0.988 | 0.982 | 0.985 |
+
+"Unresolved" is the challenge's unresolved proportion: tracklets with a labelled successor that got no accepted successor, over all tracklets with a labelled successor.
+All 480 train, 120 validation and 120 test tracklets without a successor were correctly left unlinked.
+Test errors are concentrated in three scenarios: 014 (3 wrong links, F1 0.824), 018 (1 wrong, 1 unresolved) and 010 (1 unresolved).
+Train includes the 11 scenarios used for tuning; the held-out split is broken out below.
+
+## Development results
 
 | Partition | Scenarios | True links | Correct | Wrong | Unreported | Precision | Recall | F1 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -146,7 +163,7 @@ The operating threshold should be chosen on validation, as the challenge require
 - Plausibility compares only distances, and favours longer gaps slightly. Direction comes in through the heading cosine on mean positions, not through a miss distance at the predicted point.
 - The dt penalty is absolute, so it cannot be raised to stop skips without also penalising legitimately long gaps. A penalty relative to the source's shortest available gap would avoid that.
 - Velocity covariance still reflects feed noise more than aircraft motion, which is why the velocity Wasserstein weight had to be cut.
-- The staged-demo snapshots and the test partition have not been run.
+- The staged-demo snapshots have not been run.
 
 ## Reproduce
 

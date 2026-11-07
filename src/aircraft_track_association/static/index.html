@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Track Association</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --text: #1d2330; --muted: #5d6676; --line: #dfe3ea;
+    --accent: #2f6fde; --ok: #1f8a4c; --bad: #c8372d; --warn: #a86a00; --chip: #eef1f6;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { background: var(--panel); border-bottom: 1px solid var(--line); }
+  header > div { max-width: 1440px; margin: 0 auto; padding: 14px 24px; }
+  header h1 { margin: 0; font-size: 17px; font-weight: 600; }
+  header p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  main { max-width: 1440px; margin: 0 auto; padding: 16px 24px 48px; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+  .tabs button { border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+                 padding: 7px 14px; border-radius: 6px; cursor: pointer; font: inherit; }
+  .tabs button[aria-selected="true"] { color: var(--text); border-color: var(--accent);
+                                       box-shadow: inset 0 -2px 0 var(--accent); }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: var(--panel);
+              border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; }
+  .controls label { color: var(--muted); font-size: 13px; display: flex; align-items: center; gap: 6px; }
+  select, button.primary { font: inherit; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--line);
+                           background: var(--panel); color: var(--text); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; cursor: pointer;
+                   font-weight: 500; }
+  button.primary:disabled { opacity: .6; cursor: progress; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .seg button { border: 0; background: var(--panel); padding: 6px 12px; font: inherit; cursor: pointer;
+                color: var(--muted); }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"] { background: var(--chip); color: var(--text); font-weight: 500; }
+  .spacer { flex: 1; }
+  .meta { color: var(--muted); font-size: 12px; font-family: var(--mono); }
+  .state { background: var(--panel); border: 1px dashed var(--line); border-radius: 8px;
+           padding: 40px; text-align: center; color: var(--muted); }
+  .state.error { border: 1px solid #f0c2bd; background: #fdf3f2; color: var(--bad); text-align: left; padding: 14px 16px; }
+  .state.error strong { display: block; margin-bottom: 2px; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--line);
+             border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite;
+             vertical-align: -2px; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-items: start; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; min-width: 0; }
+  .card h2 { margin: 0 0 8px; font-size: 14px; font-weight: 600; }
+  .card h3 { margin: 14px 0 6px; font-size: 13px; font-weight: 600; }
+  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .stat h2 { display: flex; align-items: baseline; gap: 8px; }
+  .stat h2 span { color: var(--muted); font-weight: 400; font-size: 12px; }
+  .kv { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+  .kv div { background: var(--chip); border-radius: 6px; padding: 6px 8px; }
+  .kv b { display: block; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .kv small { color: var(--muted); font-size: 11px; }
+  svg.plot { width: 100%; height: auto; display: block; background: #fbfcfd; border: 1px solid var(--line); border-radius: 6px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; color: var(--muted); font-size: 12px; margin-top: 6px; }
+  .legend i { display: inline-block; width: 22px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 5px; }
+  .tablewrap { overflow: auto; max-height: 520px; border: 1px solid var(--line); border-radius: 6px; }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+  th, td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; vertical-align: top; }
+  th { position: sticky; top: 0; background: #f3f5f8; font-weight: 600; color: var(--muted); z-index: 1; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr.clickable { cursor: pointer; }
+  tbody tr.clickable:hover { background: #f7f9fc; }
+  tbody tr.selected { background: #eaf1fd; }
+  .id { font-family: var(--mono); font-size: 12px; }
+  .chip { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+  .badge { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 11.5px; font-weight: 500; }
+  .badge.accepted { background: #e3f4ea; color: var(--ok); }
+  .badge.unresolved { background: #f1f2f5; color: var(--muted); }
+  .badge.wrong { background: #fbe4e2; color: var(--bad); }
+  .badge.neutral { background: #e6eefc; color: var(--accent); }
+  .tablewrap.fit { display: inline-block; max-width: 100%; vertical-align: top; }
+  .badge.changed { background: #fff1d6; color: var(--warn); }
+  .mark-ok { color: var(--ok); font-weight: 600; }
+  .mark-bad { color: var(--bad); font-weight: 600; }
+  .reason { color: var(--muted); margin: 2px 0 6px; white-space: normal; }
+  .attrs { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .hint { color: var(--muted); font-size: 12.5px; margin: 0; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header><div>
+  <h1>Aircraft track association</h1>
+  <p>Links each tracklet to its next fragment from the same aircraft, or leaves it unresolved. Two approaches: a constant-velocity baseline and the Gaussian continuity model.</p>
+</div></header>
+<main>
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="scenario">Scenario</button>
+    <button role="tab" aria-selected="false" data-tab="staged">Additional evidence (staged demo)</button>
+  </div>
+
+  <section id="tab-scenario">
+    <div class="controls">
+      <label>Scenario <select id="scenario"></select></label>
+      <button class="primary" id="run">Run association</button>
+      <label>Show links from
+        <span class="seg" id="approach-seg"></span>
+      </label>
+      <span class="spacer"></span>
+      <span class="meta" id="run-meta"></span>
+    </div>
+    <div id="scenario-state" class="state">Choose a scenario and run association.</div>
+    <div id="scenario-view" hidden>
+      <div class="stats" id="stats"></div>
+      <div class="grid">
+        <div class="card">
+          <h2>Tracklets (longitude / latitude)</h2>
+          <div id="plot"></div>
+          <div class="legend">
+            <span><i style="border-color:#555"></i>tracklet, arrow at its end</span>
+            <span><i style="border-color:var(--ok);border-top-style:dashed"></i>accepted link matching the label</span>
+            <span><i style="border-color:var(--bad);border-top-style:dashed"></i>accepted link not matching the label</span>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Decisions</h2>
+          <p class="hint">Click a row or a track to inspect candidates and original reports. Label column is shown for evaluation only; it is never an input.</p>
+          <div class="tablewrap" style="margin-top:8px;max-height:none"><table id="decisions"></table></div>
+        </div>
+      </div>
+      <div class="card" id="detail" style="margin-top:12px" hidden></div>
+    </div>
+  </section>
+
+  <section id="tab-staged" hidden>
+    <div class="controls">
+      <button class="primary" id="run-staged">Run both snapshots</button>
+      <label>Approach <span class="seg" id="staged-seg"></span></label>
+      <span class="spacer"></span>
+      <span class="meta" id="staged-meta"></span>
+    </div>
+    <div id="staged-state" class="state">Runs snapshot 1 and snapshot 2 independently with the same settings, then compares their decisions.</div>
+    <div id="staged-view" hidden>
+      <div class="grid">
+        <div class="card">
+          <h2>Snapshot 2 tracklets</h2>
+          <div id="staged-plot"></div>
+          <div class="legend">
+            <span><i style="border-color:#999;border-top-style:dashed"></i>snapshot 1 link</span>
+            <span><i style="border-color:var(--accent);border-top-style:dashed"></i>snapshot 2 link</span>
+            <span><i style="border-color:var(--warn);border-top-width:4px"></i>tracklet new in snapshot 2</span>
+          </div>
+        </div>
+        <div class="card">
+          <h2>What changed</h2>
+          <p class="hint" id="staged-summary"></p>
+          <div class="tablewrap" style="margin-top:8px"><table id="staged-table"></table></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const APPROACHES = [["baseline", "Baseline"], ["gaussian", "Gaussian continuity"]];
+const state = { scenarios: [], data: null, result: null, labels: {}, approach: "gaussian",
+                selected: null, staged: null, stagedApproach: "gaussian" };
+const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"]/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const short = (id) => id ? id.replace(/^tracklet-/, "").slice(0, 8) : "-";
+const hhmmss = (s) => new Date(s * 1000).toISOString().slice(11, 19);
+const fmt = (v) => Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 1 ? v.toFixed(2) : v.toPrecision(3);
+const colour = (i) => `hsl(${(i * 137.508) % 360} 62% 42%)`;
+
+async function api(path, body) {
+  const res = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" },
+                                         body: JSON.stringify(body) } : {});
+  const json = await res.json().catch(() => null);
+  if (!res.ok) {
+    const e = json?.error || { code: "http_error", message: res.statusText };
+    throw new Error(`${e.code} (${res.status}): ${e.message}`);
+  }
+  return json;
+}
+
+function setState(prefix, kind, html) {
+  const el = $(`#${prefix}-state`);
+  $(`#${prefix}-view`).hidden = kind !== "ok";
+  el.hidden = kind === "ok";
+  el.className = "state" + (kind === "error" ? " error" : "");
+  el.innerHTML = kind === "loading" ? `<span class="spinner"></span>${html}` :
+                 kind === "error" ? `<strong>Request failed</strong>${esc(html)}` : html;
+}
+
+function segmented(el, current, onPick) {
+  el.innerHTML = APPROACHES.map(([k, label]) =>
+    `<button type="button" data-k="${k}" aria-pressed="${k === current}">${label}</button>`).join("");
+  el.onclick = (e) => { const k = e.target.dataset.k; if (k) onPick(k); };
+}
+
+// ---------- plot ----------
+function plotSVG(tracks, links, opts = {}) {
+  // tracks: [{id, colour, points:[[lon,lat]...], bold}], links: [{from:[lon,lat], to:[lon,lat], stroke}]
+  const all = tracks.flatMap((t) => t.points);
+  if (!all.length) return `<p class="hint">No positions to plot.</p>`;
+  const lat0 = all.reduce((a, p) => a + p[1], 0) / all.length;
+  const k = Math.cos(lat0 * Math.PI / 180);  // equal ground scale in x and y
+  const xs = all.map((p) => p[0] * k), ys = all.map((p) => p[1]);
+  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  const W = 1360, HMAX = 620, pad = 50;  // equal scale, fit within W x HMAX
+  const s = Math.min((W - 2 * pad) / ((x1 - x0) || 1), (HMAX - 2 * pad) / ((y1 - y0) || 1));
+  const H = Math.round((y1 - y0) * s + 2 * pad);
+  const X = (lon) => pad + (lon * k - x0) * s + ((W - 2 * pad) - (x1 - x0) * s) / 2;
+  const Y = (lat) => H - pad - (lat - y0) * s;
+  const ticks = (a, b, n) => { const st = (b - a) / n; return Array.from({ length: n + 1 }, (_, i) => a + i * st); };
+  let g = `<svg class="plot" viewBox="0 0 ${W} ${H}" role="img" aria-label="Tracklet positions">`;
+  g += `<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="context-stroke"/></marker></defs>`;
+  for (const lat of ticks(y0, y1, 4)) g += `<line x1="${X(x0 / k)}" x2="${X(x1 / k)}" y1="${Y(lat)}" y2="${Y(lat)}" stroke="#eceff3"/><text x="${X(x0 / k) - 6}" y="${Y(lat) + 4}" font-size="10" text-anchor="end" fill="#8a93a3">${lat.toFixed(2)}</text>`;
+  for (const lon of ticks(x0 / k, x1 / k, 4)) g += `<line y1="${Y(y1)}" y2="${Y(y0)}" x1="${X(lon)}" x2="${X(lon)}" stroke="#eceff3"/><text y="${H - pad + 16}" x="${X(lon)}" font-size="10" text-anchor="middle" fill="#8a93a3">${lon.toFixed(2)}</text>`;
+  for (const l of links) g += `<line x1="${X(l.from[0])}" y1="${Y(l.from[1])}" x2="${X(l.to[0])}" y2="${Y(l.to[1])}" stroke="${l.stroke}" stroke-width="1.6" stroke-dasharray="5 4" opacity=".9"><title>${esc(l.title || "")}</title></line>`;
+  for (const t of tracks) {
+    const pts = t.points.map((p) => `${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(" ");
+    const sel = opts.selected === t.id;
+    g += `<g class="trk" data-id="${t.id}" style="cursor:pointer"><polyline points="${pts}" fill="none" stroke="transparent" stroke-width="10"/>`;
+    g += `<polyline points="${pts}" fill="none" stroke="${t.colour}" stroke-width="${sel ? 4 : t.bold ? 4 : 2}" stroke-linejoin="round" marker-end="url(#arr)" opacity="${opts.selected && !sel ? .45 : 1}"/>`;
+    g += `<title>${esc(short(t.id))}</title></g>`;
+  }
+  return g + `</svg>`;
+}
+
+function trackPoints(observations) {
+  const by = {};
+  for (const o of observations) (by[o.tracklet_id] ||= []).push(o);
+  for (const k in by) by[k].sort((a, b) => a.observed_at.localeCompare(b.observed_at));
+  return by;
+}
+
+// ---------- scenario tab ----------
+async function loadScenarios() {
+  try {
+    state.scenarios = await api("/scenarios");
+    const groups = {};
+    for (const s of state.scenarios) if (s.partition !== "staged_demo") (groups[s.partition] ||= []).push(s);
+    $("#scenario").innerHTML = Object.entries(groups).map(([p, list]) =>
+      `<optgroup label="${p}">${list.map((s) => `<option value="${p}/${s.name}">${s.name}</option>`).join("")}</optgroup>`).join("");
+    if (!state.scenarios.length) setState("scenario", "empty", "No packaged scenarios found on the server.");
+  } catch (e) { setState("scenario", "error", e.message); }
+}
+
+async function run() {
+  const [partition, name] = $("#scenario").value.split("/");
+  if (!name) return;
+  $("#run").disabled = true;
+  setState("scenario", "loading", `Running association on ${partition} / ${name}...`);
+  try {
+    const data = await api(`/scenarios/${partition}/${name}`);
+    const result = await api("/tracklets/associate", { snapshot_id: data.snapshot_id, receipt_cutoff: data.receipt_cutoff,
+                                                       observations: data.observations, supporting: data.supporting });
+    Object.assign(state, { data, result, selected: null,
+                           labels: Object.fromEntries(data.labels.map((l) => [l.tracklet_id, l.successor_tracklet_id])) });
+    $("#run-meta").textContent = `model ${result.model_version} · config ${result.config_sha256.slice(0, 10)} · input ${result.input_sha256.slice(0, 10)}`;
+    if (!result.tracklets.length) setState("scenario", "empty", "This snapshot has no tracklets.");
+    else { setState("scenario", "ok"); renderScenario(); }
+  } catch (e) { setState("scenario", "error", e.message); }
+  finally { $("#run").disabled = false; }
+}
+
+function metrics(records, labels) {
+  const acc = records.filter((r) => r.successor);
+  const correct = acc.filter((r) => labels[r.tracklet_id] === r.successor).length;
+  const truth = Object.values(labels).filter(Boolean).length;
+  const unresolved = records.filter((r) => !r.successor && labels[r.tracklet_id]).length;
+  return { accepted: acc.length, correct, wrong: acc.length - correct, unresolved, truth,
+           precision: acc.length ? correct / acc.length : null, recall: truth ? correct / truth : null };
+}
+
+function renderScenario() {
+  const { result, labels } = state;
+  $("#stats").innerHTML = APPROACHES.map(([k, label]) => {
+    const m = metrics(result.results[k], labels);
+    const pct = (v) => v === null ? "n/a" : v.toFixed(3);
+    return `<div class="card stat"><h2>${label} <span>against labels</span></h2><div class="kv">
+      <div><b>${m.accepted}</b><small>accepted</small></div><div><b>${m.correct}</b><small>correct</small></div>
+      <div><b style="color:${m.wrong ? "var(--bad)" : "inherit"}">${m.wrong}</b><small>wrong</small></div>
+      <div><b>${m.unresolved}</b><small>unresolved of ${m.truth}</small></div>
+      <div><b>${pct(m.precision)}</b><small>precision</small></div><div><b>${pct(m.recall)}</b><small>recall</small></div></div></div>`;
+  }).join("");
+  segmented($("#approach-seg"), state.approach, pickApproach);
+  renderPlot(); renderDecisions(); renderDetail();
+}
+
+function renderPlot() {
+  const { result, data, labels } = state;
+  const by = trackPoints(data.observations.filter((o, i, a) => a.findIndex((x) => x.observation_id === o.observation_id) === i));
+  const idx = Object.fromEntries(result.tracklets.map((t, i) => [t.tracklet_id, i]));
+  const tracks = result.tracklets.map((t, i) => ({ id: t.tracklet_id, colour: colour(i),
+                                                    points: (by[t.tracklet_id] || []).map((o) => [o.longitude, o.latitude]) }));
+  const pos = Object.fromEntries(tracks.map((t) => [t.id, t.points]));
+  const links = result.results[state.approach].filter((r) => r.successor).map((r) => ({
+    from: pos[r.tracklet_id].at(-1), to: pos[r.successor][0],
+    stroke: labels[r.tracklet_id] === r.successor ? "var(--ok)" : "var(--bad)",
+    title: `${short(r.tracklet_id)} -> ${short(r.successor)}` }));
+  $("#plot").innerHTML = plotSVG(tracks, links, { selected: state.selected });
+  $("#plot").onclick = (e) => { const g = e.target.closest(".trk"); if (g) select(g.dataset.id); };
+  state.colourOf = Object.fromEntries(Object.entries(idx).map(([id, i]) => [id, colour(i)]));
+}
+
+function decisionCell(r, label) {
+  if (!r.successor) return `<span class="badge unresolved">unresolved</span>`;
+  const ok = label === r.successor;
+  return `<span class="badge ${ok ? "accepted" : "wrong"}">${ok ? "accepted" : "wrong"}</span> <span class="id">${short(r.successor)}</span>`;
+}
+
+function renderDecisions() {
+  const { result, labels } = state;
+  const rec = Object.fromEntries(APPROACHES.map(([k]) => [k, Object.fromEntries(result.results[k].map((r) => [r.tracklet_id, r]))]));
+  let h = `<thead><tr><th>Tracklet</th><th>Source</th><th>Start (UTC)</th><th class="num">Reports</th><th>Baseline</th><th>Gaussian</th><th>Agree</th><th>Label</th></tr></thead><tbody>`;
+  for (const t of result.tracklets) {
+    const b = rec.baseline[t.tracklet_id], g = rec.gaussian[t.tracklet_id], l = labels[t.tracklet_id];
+    const agree = b.successor === g.successor;
+    h += `<tr class="clickable${state.selected === t.tracklet_id ? " selected" : ""}" data-id="${t.tracklet_id}">
+      <td><span class="chip" style="background:${state.colourOf[t.tracklet_id]}"></span><span class="id">${short(t.tracklet_id)}</span></td>
+      <td>${esc(t.source)}</td><td>${hhmmss(t.start_s)}</td><td class="num">${t.observation_count}</td>
+      <td>${decisionCell(b, l)}</td><td>${decisionCell(g, l)}</td>
+      <td>${agree ? "yes" : `<span class="badge changed">differ</span>`}</td><td class="id">${l ? short(l) : "none"}</td></tr>`;
+  }
+  $("#decisions").innerHTML = h + "</tbody>";
+  $("#decisions").onclick = (e) => { const tr = e.target.closest("tr[data-id]"); if (tr) select(tr.dataset.id); };
+}
+
+function select(id) { state.selected = id; renderPlot(); renderDecisions(); renderDetail(); $("#detail").scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+
+function renderDetail() {
+  const el = $("#detail"), id = state.selected;
+  if (!id) { el.hidden = true; return; }
+  el.hidden = false;
+  const label = state.labels[id];
+  let h = `<h2><span class="chip" style="background:${state.colourOf[id]}"></span>Tracklet <span class="id">${esc(id)}</span></h2>
+           <p class="hint">Labelled successor: <span class="id">${label ? esc(short(label)) : "none"}</span>. Scores are costs: lower is better, 0 is a perfect fit; they are not probabilities.</p>`;
+  for (const [k, title] of APPROACHES) {
+    const r = state.result.results[k].find((x) => x.tracklet_id === id);
+    const names = [...new Set(r.candidates.flatMap((c) => Object.keys(c.measurements)))];
+    const vsLabel = !r.successor ? "" : r.successor === label ? `<span class="badge accepted">matches label</span>`
+                                                               : `<span class="badge wrong">differs from label</span>`;
+    h += `<h3>${title}: <span class="badge ${r.successor ? "neutral" : "unresolved"}">${r.status}</span> ${vsLabel}</h3>
+          <p class="reason">${esc(r.reason)}</p>`;
+    if (!r.candidates.length) { h += `<p class="hint">No candidates.</p>`; continue; }
+    h += `<div class="tablewrap fit"><table><thead><tr><th class="num">#</th><th>Candidate</th><th class="num">Score</th>${names.map((n) => `<th class="num">${esc(n)}</th>`).join("")}<th></th></tr></thead><tbody>`;
+    r.candidates.forEach((c, i) => {
+      const tags = [c.tracklet_id === r.successor ? `<span class="badge accepted">accepted</span>` : "",
+                    c.tracklet_id === label ? `<span class="badge unresolved">label</span>` : ""].join(" ");
+      h += `<tr><td class="num">${i + 1}</td><td class="id"><span class="chip" style="background:${state.colourOf[c.tracklet_id]}"></span>${short(c.tracklet_id)}</td>
+            <td class="num">${fmt(c.score)}</td>${names.map((n) => `<td class="num">${n in c.measurements ? fmt(c.measurements[n]) : ""}</td>`).join("")}<td>${tags}</td></tr>`;
+    });
+    h += `</tbody></table></div>`;
+  }
+  const sup = Object.fromEntries(state.data.supporting.map((s) => [s.observation_id, s]));
+  const seen = new Set();
+  const reports = state.data.observations.filter((o) => o.tracklet_id === id && !seen.has(o.observation_id) && seen.add(o.observation_id))
+                                         .sort((a, b) => a.observed_at.localeCompare(b.observed_at));
+  h += `<h3>Original reports (${reports.length} unique, sorted by observation time)</h3><div class="tablewrap" style="max-height:340px"><table>
+        <thead><tr><th>Observed (UTC)</th><th>Received (UTC)</th><th class="num">Latitude</th><th class="num">Longitude</th><th class="num">Altitude ft</th><th>Source</th><th>Attributes</th><th>Supporting record</th></tr></thead><tbody>`;
+  for (const o of reports) {
+    const s = sup[o.observation_id];
+    h += `<tr><td>${esc(o.observed_at.slice(11, 23))}</td><td>${esc(o.received_at.slice(11, 23))}</td><td class="num">${o.latitude.toFixed(5)}</td>
+          <td class="num">${o.longitude.toFixed(5)}</td><td class="num">${o.altitude_ft ?? "<span class='hint'>missing</span>"}</td><td>${esc(o.source)}</td>
+          <td class="attrs">${esc(JSON.stringify(o.attributes ?? {}))}</td><td class="attrs">${s ? esc(JSON.stringify(s.attributes)) : ""}</td></tr>`;
+  }
+  el.innerHTML = h + `</tbody></table></div>`;
+}
+
+// ---------- staged tab ----------
+async function runStaged() {
+  const snaps = state.scenarios.filter((s) => s.partition === "staged_demo");
+  if (snaps.length < 2) { setState("staged", "empty", "The staged demo snapshots are not available on the server."); return; }
+  $("#run-staged").disabled = true;
+  setState("staged", "loading", "Running snapshot 1 and snapshot 2 independently...");
+  try {
+    const out = [];
+    for (const s of snaps.slice(0, 2)) {
+      const data = await api(`/scenarios/staged_demo/${s.name}`);
+      const result = await api("/tracklets/associate", { snapshot_id: data.snapshot_id, receipt_cutoff: data.receipt_cutoff,
+                                                         observations: data.observations, supporting: data.supporting });
+      out.push({ name: s.name, data, result, labels: Object.fromEntries(data.labels.map((l) => [l.tracklet_id, l.successor_tracklet_id])) });
+    }
+    state.staged = out;
+    $("#staged-meta").textContent = out.map((o) => `${o.name}: cutoff ${o.result.receipt_cutoff} · input ${o.result.input_sha256.slice(0, 10)}`).join("  |  ");
+    setState("staged", "ok"); renderStaged();
+  } catch (e) { setState("staged", "error", e.message); }
+  finally { $("#run-staged").disabled = false; }
+}
+
+function renderStaged() {
+  const [s1, s2] = state.staged, k = state.stagedApproach;
+  segmented($("#staged-seg"), k, pickStaged);
+  const r1 = Object.fromEntries(s1.result.results[k].map((r) => [r.tracklet_id, r]));
+  const r2 = Object.fromEntries(s2.result.results[k].map((r) => [r.tracklet_id, r]));
+  const old = new Set(s1.result.tracklets.map((t) => t.tracklet_id));
+  const by = trackPoints(s2.data.observations);
+  const tracks = s2.result.tracklets.map((t, i) => ({ id: t.tracklet_id, colour: old.has(t.tracklet_id) ? colour(i) : "var(--warn)",
+                                                       bold: !old.has(t.tracklet_id), points: by[t.tracklet_id].map((o) => [o.longitude, o.latitude]) }));
+  const pos = Object.fromEntries(tracks.map((t) => [t.id, t.points]));
+  const mk = (recs, stroke) => Object.values(recs).filter((r) => r.successor && pos[r.successor]).map((r) => ({ from: pos[r.tracklet_id].at(-1), to: pos[r.successor][0], stroke, title: `${short(r.tracklet_id)} -> ${short(r.successor)}` }));
+  $("#staged-plot").innerHTML = plotSVG(tracks, [...mk(r1, "#999"), ...mk(r2, "var(--accent)")]);
+  let changes = 0;
+  let h = `<thead><tr><th>Tracklet</th><th>Snapshot 1</th><th>Snapshot 2</th><th>Change</th><th>Labels 1 / 2</th></tr></thead><tbody>`;
+  const changed = (id) => !r1[id] || r1[id].successor !== r2[id].successor;
+  const ordered = [...s2.result.tracklets].sort((p, q) => changed(q.tracklet_id) - changed(p.tracklet_id));
+  for (const t of ordered) {
+    const id = t.tracklet_id, a = r1[id], b = r2[id];
+    const cell = (r, labels) => !r ? `<span class="hint">not yet received</span>` : r.successor
+      ? `<span class="badge ${labels[id] === r.successor ? "accepted" : "wrong"}">accepted</span> <span class="id">${short(r.successor)}</span>`
+      : `<span class="badge unresolved">unresolved</span>`;
+    let change = "unchanged";
+    if (!a) change = "new tracklet";
+    else if (a.successor !== b.successor) change = !a.successor ? "link added" : !b.successor ? "link withdrawn" : "link replaced";
+    if (change !== "unchanged") changes++;
+    h += `<tr${change !== "unchanged" ? ' class="selected"' : ""}><td class="id">${short(id)}</td><td>${cell(a, s1.labels)}</td><td>${cell(b, s2.labels)}</td>
+          <td>${change === "unchanged" ? '<span class="hint">unchanged</span>' : `<span class="badge changed">${change}</span>`}</td>
+          <td class="id">${short(s1.labels[id])} / ${short(s2.labels[id])}</td></tr>
+          ${change !== "unchanged" && b ? `<tr><td></td><td colspan="4" class="reason">${a ? `Snapshot 1: ${esc(a.reason)}<br>` : ""}Snapshot 2: ${esc(b.reason)}</td></tr>` : ""}`;
+  }
+  $("#staged-table").innerHTML = h + "</tbody>";
+  $("#staged-summary").textContent = `${changes} tracklet${changes === 1 ? "" : "s"} changed between snapshots (${s1.result.tracklets.length} → ${s2.result.tracklets.length} tracklets). Green and red badges compare each decision with that snapshot's own labels.`;
+}
+
+// ---------- wiring ----------
+document.querySelector(".tabs").onclick = (e) => {
+  const tab = e.target.dataset.tab; if (!tab) return;
+  for (const b of document.querySelectorAll(".tabs button")) b.setAttribute("aria-selected", b.dataset.tab === tab);
+  $("#tab-scenario").hidden = tab !== "scenario"; $("#tab-staged").hidden = tab !== "staged";
+};
+$("#run").onclick = run;
+$("#run-staged").onclick = runStaged;
+function pickApproach(k) { state.approach = k; state.result ? renderScenario() : segmented($("#approach-seg"), k, pickApproach); }
+function pickStaged(k) { state.stagedApproach = k; state.staged ? renderStaged() : segmented($("#staged-seg"), k, pickStaged); }
+segmented($("#approach-seg"), state.approach, pickApproach);
+segmented($("#staged-seg"), state.stagedApproach, pickStaged);
+loadScenarios();
+</script>
+</body>
+</html>

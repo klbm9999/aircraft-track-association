@@ -21,7 +21,7 @@ from dataclasses import dataclass
 import numpy as np
 from pyproj import Transformer
 
-from .io import load_observations, load_supporting_altitude, parse_time
+from .io import InputError, load_observations, load_supporting, parse_time, supporting_altitude
 
 FT_TO_M = 0.3048
 DUP_DT_S = 0.5  # near-duplicate: same tracklet and feed, closer than this in time...
@@ -99,7 +99,7 @@ def build_tracklet(tid: str, t: np.ndarray, p: np.ndarray) -> Tracklet:
 
 def load_tracklets(scenario_dir, use_supporting: bool = True) -> list[Tracklet]:
     """Read a scenario directory and build its Tracklet models."""
-    support = load_supporting_altitude(scenario_dir) if use_supporting else {}
+    support = supporting_altitude(load_supporting(scenario_dir)) if use_supporting else {}
     return build_tracklets(load_observations(scenario_dir), support)
 
 
@@ -113,7 +113,8 @@ def altitude_m(obs: dict, support_alt_m: dict[str, float]) -> float | None:
 def build_tracklets(
     observations: list[dict], support_alt_m: dict[str, float] | None = None
 ) -> list[Tracklet]:
-    """Group a scenario's (already ID-deduplicated) observations into Tracklet models."""
+    """Group a scenario's (already ID-deduplicated) observations into Tracklet models,
+    returned in (start time, id) order so results do not depend on input order."""
     support_alt_m = support_alt_m or {}
     to_m = projector(observations)
     # Fallback only for a tracklet with no altitude at all; none occur in the packaged data.
@@ -126,7 +127,8 @@ def build_tracklets(
 
     tracklets = []
     for tid, obs in groups.items():
-        obs.sort(key=lambda o: parse_time(o["observed_at"]))  # file order is not time order
+        # File order is not time order; the ID breaks ties so equal timestamps sort stably.
+        obs.sort(key=lambda o: (parse_time(o["observed_at"]), o["observation_id"]))
 
         # Metric coordinates: x east, y north, z altitude (still missing -> tracklet mean).
         z = [altitude_m(o, support_alt_m) for o in obs]
@@ -148,5 +150,7 @@ def build_tracklets(
             )
             if not near:
                 keep.append(i)
+        if len(np.unique(t[keep])) < 2:  # contract: a tracklet needs two distinct reports
+            raise InputError(f"{tid}: a tracklet needs at least two reports at distinct times")
         tracklets.append(build_tracklet(tid, t[keep], p[keep]))
-    return tracklets
+    return sorted(tracklets, key=lambda tr: (tr.t[0], tr.id))

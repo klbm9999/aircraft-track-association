@@ -1,0 +1,2574 @@
+{
+  "snapshot_id": "snapshot-0f61d5f0-f016-67ba-4361-759ffcd768ad",
+  "receipt_cutoff": "2026-06-09T00:20:00.000Z",
+  "input_sha256": "04d5059277cbb0920080ebdd1cd40fedbb25d37373603d83d4c8635bd2e5a3c0",
+  "model_version": "0.1.0",
+  "config_sha256": "75520115019fa3971fe0990f9df860a332533fed233371982df4f1a8240ae0de",
+  "config": {
+    "preprocessing": {
+      "projection": "local azimuthal equidistant, centred on the scenario mean position",
+      "altitude": "altitude_ft * 0.3048, else supporting a1 (metres), else tracklet mean",
+      "near_duplicate_dt_s": 0.5,
+      "near_duplicate_dist_m": 50.0,
+      "min_velocity_window_s": 10.0,
+      "endpoint_fit_points": 6
+    },
+    "baseline": {
+      "tolerance": 0.05
+    },
+    "gaussian": {
+      "weights": {
+        "plausibility": 0.35,
+        "heading": 3.0,
+        "vel_cos": 0.15,
+        "vel_w2": 0.05,
+        "pos_w2": 0.03,
+        "alt_w2": 0.3,
+        "dt": 0.15
+      },
+      "scales": {
+        "plausibility": 0.25,
+        "heading": 0.02,
+        "vel_cos": 0.005,
+        "vel_w2": 36.0,
+        "pos_w2": 56000.0,
+        "alt_w2": 700.0,
+        "dt": 225.0
+      },
+      "no_match_cost": 1.0
+    }
+  },
+  "counts": {
+    "observation_rows": 298,
+    "unique_observations": 288,
+    "supporting_rows": 190,
+    "unique_supporting": 184,
+    "tracklets": 23
+  },
+  "tracklets": [
+    {
+      "tracklet_id": "tracklet-aa82aa85-67bd-e4fe-cc6e-5e0d9ae7e648",
+      "source": "feed-c",
+      "observation_count": 18,
+      "start_s": 1780963215.391,
+      "end_s": 1780963335.605
+    },
+    {
+      "tracklet_id": "tracklet-97c73082-2aab-0792-5643-9cd74024ea78",
+      "source": "feed-a",
+      "observation_count": 15,
+      "start_s": 1780963231.419,
+      "end_s": 1780963356.272
+    },
+    {
+      "tracklet_id": "tracklet-4109defd-9f18-83c1-2830-44c7dfb2c828",
+      "source": "feed-b",
+      "observation_count": 10,
+      "start_s": 1780963237.294,
+      "end_s": 1780963345.542
+    },
+    {
+      "tracklet_id": "tracklet-095baef0-86b8-25d4-772a-0343dbd5755c",
+      "source": "feed-c",
+      "observation_count": 12,
+      "start_s": 1780963238.087,
+      "end_s": 1780963353.13
+    },
+    {
+      "tracklet_id": "tracklet-c0fe73d2-c2bc-8fb5-c015-ab06a7132a4f",
+      "source": "feed-c",
+      "observation_count": 10,
+      "start_s": 1780963239.156,
+      "end_s": 1780963336.337
+    },
+    {
+      "tracklet_id": "tracklet-57e69311-fb16-c4bd-d71d-b6b8583bba9f",
+      "source": "feed-c",
+      "observation_count": 16,
+      "start_s": 1780963243.015,
+      "end_s": 1780963341.549
+    },
+    {
+      "tracklet_id": "tracklet-6ce3a263-0047-5f03-4318-736bf54b9afb",
+      "source": "feed-c",
+      "observation_count": 7,
+      "start_s": 1780963439.666,
+      "end_s": 1780963535.983
+    },
+    {
+      "tracklet_id": "tracklet-4988f186-83b6-51e6-b59d-513774b5e61e",
+      "source": "feed-c",
+      "observation_count": 14,
+      "start_s": 1780963445.896,
+      "end_s": 1780963545.837
+    },
+    {
+      "tracklet_id": "tracklet-315a4e10-21ea-1e4a-04a7-5767800d1788",
+      "source": "feed-a",
+      "observation_count": 10,
+      "start_s": 1780963449.434,
+      "end_s": 1780963543.925
+    },
+    {
+      "tracklet_id": "tracklet-cc1e490a-83fb-f504-5bdd-7f0cff962a0a",
+      "source": "feed-c",
+      "observation_count": 12,
+      "start_s": 1780963458.595,
+      "end_s": 1780963561.078
+    },
+    {
+      "tracklet_id": "tracklet-0cf33031-615b-c30f-0fa5-b16619688f2f",
+      "source": "feed-c",
+      "observation_count": 9,
+      "start_s": 1780963464.721,
+      "end_s": 1780963549.952
+    },
+    {
+      "tracklet_id": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+      "source": "feed-c",
+      "observation_count": 15,
+      "start_s": 1780963665.898,
+      "end_s": 1780963791.041
+    },
+    {
+      "tracklet_id": "tracklet-2db24cf0-2215-64db-94cc-a7defed7f98a",
+      "source": "feed-b",
+      "observation_count": 15,
+      "start_s": 1780963667.869,
+      "end_s": 1780963775.924
+    },
+    {
+      "tracklet_id": "tracklet-88a1d73d-4188-2250-25aa-25325111de11",
+      "source": "feed-a",
+      "observation_count": 14,
+      "start_s": 1780963680.308,
+      "end_s": 1780963792.811
+    },
+    {
+      "tracklet_id": "tracklet-2b7e0c4f-065a-e882-8d2b-67110927b0d6",
+      "source": "feed-b",
+      "observation_count": 13,
+      "start_s": 1780963680.392,
+      "end_s": 1780963791.831
+    },
+    {
+      "tracklet_id": "tracklet-1d397900-b14a-53fe-12ba-345ed48f2666",
+      "source": "feed-a",
+      "observation_count": 10,
+      "start_s": 1780963682.066,
+      "end_s": 1780963787.05
+    },
+    {
+      "tracklet_id": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+      "source": "feed-a",
+      "observation_count": 13,
+      "start_s": 1780963682.678,
+      "end_s": 1780963796.135
+    },
+    {
+      "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+      "source": "feed-b",
+      "observation_count": 10,
+      "start_s": 1780963878.965,
+      "end_s": 1780963983.094
+    },
+    {
+      "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+      "source": "feed-a",
+      "observation_count": 21,
+      "start_s": 1780963885.265,
+      "end_s": 1780964013.824
+    },
+    {
+      "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+      "source": "feed-b",
+      "observation_count": 14,
+      "start_s": 1780963885.266,
+      "end_s": 1780963972.609
+    },
+    {
+      "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+      "source": "feed-b",
+      "observation_count": 10,
+      "start_s": 1780963887.224,
+      "end_s": 1780963983.051
+    },
+    {
+      "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+      "source": "feed-a",
+      "observation_count": 11,
+      "start_s": 1780963895.765,
+      "end_s": 1780964007.989
+    },
+    {
+      "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+      "source": "feed-c",
+      "observation_count": 9,
+      "start_s": 1780963904.386,
+      "end_s": 1780963992.951
+    }
+  ],
+  "results": {
+    "baseline": [
+      {
+        "tracklet_id": "tracklet-aa82aa85-67bd-e4fe-cc6e-5e0d9ae7e648",
+        "status": "accepted",
+        "successor": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+        "score": 0.016207653151406376,
+        "reason": "displacement 77214 m vs projected 78486 m over 550 s (ratio 0.984, within +/-5%)",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 0.016207653151406376,
+            "measurements": {
+              "dt_s": 549.6600000858307,
+              "displacement_m": 77214.07339974599,
+              "projected_m": 78486.14969112918,
+              "ratio": 0.9837923468485936
+            }
+          },
+          {
+            "tracklet_id": "tracklet-315a4e10-21ea-1e4a-04a7-5767800d1788",
+            "score": 0.0170100974101971,
+            "measurements": {
+              "dt_s": 113.8289999961853,
+              "displacement_m": 15977.207223373753,
+              "projected_m": 16253.683970994936,
+              "ratio": 0.9829899025898029
+            }
+          },
+          {
+            "tracklet_id": "tracklet-2db24cf0-2215-64db-94cc-a7defed7f98a",
+            "score": 0.01907147662484343,
+            "measurements": {
+              "dt_s": 332.26399993896484,
+              "displacement_m": 46539.267433241555,
+              "projected_m": 47444.09640889053,
+              "ratio": 0.9809285233751566
+            }
+          },
+          {
+            "tracklet_id": "tracklet-4988f186-83b6-51e6-b59d-513774b5e61e",
+            "score": 0.026406133178601743,
+            "measurements": {
+              "dt_s": 110.29099988937378,
+              "displacement_m": 15332.634891358064,
+              "projected_m": 15748.491659480402,
+              "ratio": 0.9735938668213983
+            }
+          },
+          {
+            "tracklet_id": "tracklet-1d397900-b14a-53fe-12ba-345ed48f2666",
+            "score": 0.031326528593051184,
+            "measurements": {
+              "dt_s": 346.4609999656677,
+              "displacement_m": 47921.52734680399,
+              "projected_m": 49471.291163987815,
+              "ratio": 0.9686734714069488
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-97c73082-2aab-0792-5643-9cd74024ea78",
+        "status": "accepted",
+        "successor": "tracklet-4988f186-83b6-51e6-b59d-513774b5e61e",
+        "score": 0.03532678825651325,
+        "reason": "displacement 11709 m vs projected 12138 m over 90 s (ratio 0.965, within +/-5%)",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-0cf33031-615b-c30f-0fa5-b16619688f2f",
+            "score": 0.031738879238882634,
+            "measurements": {
+              "dt_s": 108.44899988174438,
+              "displacement_m": 14220.843100305543,
+              "projected_m": 14686.99175809829,
+              "ratio": 0.9682611207611174
+            }
+          },
+          {
+            "tracklet_id": "tracklet-4988f186-83b6-51e6-b59d-513774b5e61e",
+            "score": 0.03532678825651325,
+            "measurements": {
+              "dt_s": 89.62399983406067,
+              "displacement_m": 11708.785249120761,
+              "projected_m": 12137.566490479274,
+              "ratio": 0.9646732117434867
+            }
+          },
+          {
+            "tracklet_id": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+            "score": 0.0364792675235065,
+            "measurements": {
+              "dt_s": 309.62599992752075,
+              "displacement_m": 40402.27180181522,
+              "projected_m": 41931.91743572668,
+              "ratio": 0.9635207324764935
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.03936671717285256,
+            "measurements": {
+              "dt_s": 539.4930000305176,
+              "displacement_m": 70186.04061357031,
+              "projected_m": 73062.26201845986,
+              "ratio": 0.9606332828271474
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.04040858118153123,
+            "measurements": {
+              "dt_s": 530.9519999027252,
+              "displacement_m": 68999.97230912023,
+              "projected_m": 71905.57455596978,
+              "ratio": 0.9595914188184688
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-4109defd-9f18-83c1-2830-44c7dfb2c828",
+        "status": "accepted",
+        "successor": "tracklet-0cf33031-615b-c30f-0fa5-b16619688f2f",
+        "score": 0.012597400272668535,
+        "reason": "displacement 16200 m vs projected 15999 m over 119 s (ratio 1.013, within +/-5%)",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-0cf33031-615b-c30f-0fa5-b16619688f2f",
+            "score": 0.012597400272668535,
+            "measurements": {
+              "dt_s": 119.17899990081787,
+              "displacement_m": 16200.408073184712,
+              "projected_m": 15998.863979724147,
+              "ratio": 1.0125974002726685
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 0.023682390235044037,
+            "measurements": {
+              "dt_s": 558.8439998626709,
+              "displacement_m": 76797.17315392234,
+              "projected_m": 75020.50820302693,
+              "ratio": 1.023682390235044
+            }
+          },
+          {
+            "tracklet_id": "tracklet-4988f186-83b6-51e6-b59d-513774b5e61e",
+            "score": 0.025816776045434864,
+            "measurements": {
+              "dt_s": 100.35399985313416,
+              "displacement_m": 13819.549748306388,
+              "projected_m": 13471.752530292311,
+              "ratio": 1.0258167760454349
+            }
+          },
+          {
+            "tracklet_id": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+            "score": 0.030522182033692946,
+            "measurements": {
+              "dt_s": 320.35599994659424,
+              "displacement_m": 41692.712256349565,
+              "projected_m": 43005.32872821082,
+              "ratio": 0.969477817966307
+            }
+          },
+          {
+            "tracklet_id": "tracklet-1d397900-b14a-53fe-12ba-345ed48f2666",
+            "score": 0.031762611531013896,
+            "measurements": {
+              "dt_s": 336.5239999294281,
+              "displacement_m": 46610.658420618325,
+              "projected_m": 45175.75835729656,
+              "ratio": 1.031762611531014
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-095baef0-86b8-25d4-772a-0343dbd5755c",
+        "status": "accepted",
+        "successor": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+        "score": 0.01194544904471595,
+        "reason": "displacement 49299 m vs projected 48717 m over 330 s (ratio 1.012, within +/-5%)",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+            "score": 0.01194544904471595,
+            "measurements": {
+              "dt_s": 329.5479998588562,
+              "displacement_m": 49298.8450302893,
+              "projected_m": 48716.89978627581,
+              "ratio": 1.011945449044716
+            }
+          },
+          {
+            "tracklet_id": "tracklet-cc1e490a-83fb-f504-5bdd-7f0cff962a0a",
+            "score": 0.012423012542672529,
+            "measurements": {
+              "dt_s": 105.46499991416931,
+              "displacement_m": 15784.518115429579,
+              "projected_m": 15590.833001501216,
+              "ratio": 1.0124230125426725
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 0.014752635008366877,
+            "measurements": {
+              "dt_s": 532.135999917984,
+              "displacement_m": 79825.89407493145,
+              "projected_m": 78665.37254596365,
+              "ratio": 1.0147526350083669
+            }
+          },
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 0.07159501651078859,
+            "measurements": {
+              "dt_s": 532.1349999904633,
+              "displacement_m": 73033.1866640568,
+              "projected_m": 78665.22472722756,
+              "ratio": 0.9284049834892114
+            }
+          },
+          {
+            "tracklet_id": "tracklet-2db24cf0-2215-64db-94cc-a7defed7f98a",
+            "score": 0.08796308669318642,
+            "measurements": {
+              "dt_s": 314.7389998435974,
+              "displacement_m": 42434.973916647934,
+              "projected_m": 46527.69344914947,
+              "ratio": 0.9120369133068136
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-c0fe73d2-c2bc-8fb5-c015-ab06a7132a4f",
+        "status": "accepted",
+        "successor": "tracklet-6ce3a263-0047-5f03-4318-736bf54b9afb",
+        "score": 0.048252685765960535,
+        "reason": "displacement 16715 m vs projected 17563 m over 103 s (ratio 0.952, within +/-5%)",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-88a1d73d-4188-2250-25aa-25325111de11",
+            "score": 0.04666824509721401,
+            "measurements": {
+              "dt_s": 343.97100019454956,
+              "displacement_m": 55736.592560951634,
+              "projected_m": 58465.05403214567,
+              "ratio": 0.953331754902786
+            }
+          },
+          {
+            "tracklet_id": "tracklet-6ce3a263-0047-5f03-4318-736bf54b9afb",
+            "score": 0.048252685765960535,
+            "measurements": {
+              "dt_s": 103.3289999961853,
+              "displacement_m": 16715.463072139315,
+              "projected_m": 17562.921189424967,
+              "ratio": 0.9517473142340395
+            }
+          },
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 0.048603888872879475,
+            "measurements": {
+              "dt_s": 542.6280000209808,
+              "displacement_m": 87748.17606234163,
+              "projected_m": 92230.95936180171,
+              "ratio": 0.9513961111271205
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 0.13390938454148638,
+            "measurements": {
+              "dt_s": 548.9290001392365,
+              "displacement_m": 80807.93975211568,
+              "projected_m": 93301.94590474285,
+              "ratio": 0.8660906154585136
+            }
+          },
+          {
+            "tracklet_id": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+            "score": 0.14501540967443083,
+            "measurements": {
+              "dt_s": 346.34100008010864,
+              "displacement_m": 50331.13454115935,
+              "projected_m": 58867.88500128848,
+              "ratio": 0.8549845903255692
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-57e69311-fb16-c4bd-d71d-b6b8583bba9f",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "closest candidate 2b7e0c4f has ratio 1.073, outside +/-5%",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-2b7e0c4f-065a-e882-8d2b-67110927b0d6",
+            "score": 0.07287618596528134,
+            "measurements": {
+              "dt_s": 338.84299993515015,
+              "displacement_m": 44040.752451427856,
+              "projected_m": 41049.24037604935,
+              "ratio": 1.0728761859652813
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.07296287135568225,
+            "measurements": {
+              "dt_s": 545.6749999523163,
+              "displacement_m": 70929.2483824954,
+              "projected_m": 66105.96720171381,
+              "ratio": 1.0729628713556822
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.07411752999585453,
+            "measurements": {
+              "dt_s": 554.2160000801086,
+              "displacement_m": 72116.96988433646,
+              "projected_m": 67140.66931261684,
+              "ratio": 1.0741175299958545
+            }
+          },
+          {
+            "tracklet_id": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+            "score": 0.07725950224556533,
+            "measurements": {
+              "dt_s": 324.3489999771118,
+              "displacement_m": 42329.14570812396,
+              "projected_m": 39293.36025339126,
+              "ratio": 1.0772595022455653
+            }
+          },
+          {
+            "tracklet_id": "tracklet-4988f186-83b6-51e6-b59d-513774b5e61e",
+            "score": 0.07858868957090048,
+            "measurements": {
+              "dt_s": 104.34699988365173,
+              "displacement_m": 13634.601069749737,
+              "projected_m": 12641.149681602956,
+              "ratio": 1.0785886895709005
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-6ce3a263-0047-5f03-4318-736bf54b9afb",
+        "status": "accepted",
+        "successor": "tracklet-88a1d73d-4188-2250-25aa-25325111de11",
+        "score": 0.044910099976633866,
+        "reason": "displacement 23332 m vs projected 24429 m over 144 s (ratio 0.955, within +/-5%)",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-88a1d73d-4188-2250-25aa-25325111de11",
+            "score": 0.044910099976633866,
+            "measurements": {
+              "dt_s": 144.32500004768372,
+              "displacement_m": 23332.183612222256,
+              "projected_m": 24429.3061958371,
+              "ratio": 0.9550899000233661
+            }
+          },
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 0.04666969979651936,
+            "measurements": {
+              "dt_s": 342.981999874115,
+              "displacement_m": 55345.75186216209,
+              "projected_m": 58055.16917940087,
+              "ratio": 0.9533303002034806
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 0.17521742726419942,
+            "measurements": {
+              "dt_s": 349.2829999923706,
+              "displacement_m": 48762.559262860974,
+              "projected_m": 59121.71386104311,
+              "ratio": 0.8247825727358006
+            }
+          },
+          {
+            "tracklet_id": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+            "score": 0.24145411477317547,
+            "measurements": {
+              "dt_s": 146.6949999332428,
+              "displacement_m": 18835.04814963846,
+              "projected_m": 24830.466444368492,
+              "ratio": 0.7585458852268245
+            }
+          },
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 0.2959208714260009,
+            "measurements": {
+              "dt_s": 349.28200006484985,
+              "displacement_m": 41626.2456071098,
+              "projected_m": 59121.54460737555,
+              "ratio": 0.7040791285739991
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-4988f186-83b6-51e6-b59d-513774b5e61e",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "closest candidate d81aeacc has ratio 1.068, outside +/-5%",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 0.06827373963338146,
+            "measurements": {
+              "dt_s": 358.54900002479553,
+              "displacement_m": 54338.054651476996,
+              "projected_m": 50865.291016256895,
+              "ratio": 1.0682737396333815
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.08649717578794214,
+            "measurements": {
+              "dt_s": 349.9280002117157,
+              "displacement_m": 45348.36224797959,
+              "projected_m": 49642.2791983099,
+              "ratio": 0.9135028242120579
+            }
+          },
+          {
+            "tracklet_id": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+            "score": 0.08702291008056096,
+            "measurements": {
+              "dt_s": 120.06100010871887,
+              "displacement_m": 15550.159723279334,
+              "projected_m": 17032.36575701092,
+              "ratio": 0.912977089919439
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.08830447535357477,
+            "measurements": {
+              "dt_s": 341.38700008392334,
+              "displacement_m": 44153.97629800665,
+              "projected_m": 48430.61647706398,
+              "ratio": 0.9116955246464252
+            }
+          },
+          {
+            "tracklet_id": "tracklet-2b7e0c4f-065a-e882-8d2b-67110927b0d6",
+            "score": 0.09549731035675646,
+            "measurements": {
+              "dt_s": 134.5550000667572,
+              "displacement_m": 17265.64159156486,
+              "projected_m": 19088.546434698634,
+              "ratio": 0.9045026896432435
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-315a4e10-21ea-1e4a-04a7-5767800d1788",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "closest candidate 7afdc09c has ratio 1.476, outside +/-5%",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.47590855178459135,
+            "measurements": {
+              "dt_s": 343.29900002479553,
+              "displacement_m": 45284.334370150944,
+              "projected_m": 30682.344319636537,
+              "ratio": 1.4759085517845913
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.48197900850000686,
+            "measurements": {
+              "dt_s": 351.8400001525879,
+              "displacement_m": 46601.86154465913,
+              "projected_m": 31445.696111328496,
+              "ratio": 1.4819790085000069
+            }
+          },
+          {
+            "tracklet_id": "tracklet-1d397900-b14a-53fe-12ba-345ed48f2666",
+            "score": 0.51194448318163,
+            "measurements": {
+              "dt_s": 138.14100003242493,
+              "displacement_m": 18666.99629269322,
+              "projected_m": 12346.350345755885,
+              "ratio": 1.51194448318163
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 0.5169345444807176,
+            "measurements": {
+              "dt_s": 360.4609999656677,
+              "displacement_m": 48869.86344690555,
+              "projected_m": 32216.19787400573,
+              "ratio": 1.5169345444807176
+            }
+          },
+          {
+            "tracklet_id": "tracklet-2db24cf0-2215-64db-94cc-a7defed7f98a",
+            "score": 0.5604396771897764,
+            "measurements": {
+              "dt_s": 123.94400000572205,
+              "displacement_m": 17285.760577562476,
+              "projected_m": 11077.493625830324,
+              "ratio": 1.5604396771897764
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-cc1e490a-83fb-f504-5bdd-7f0cff962a0a",
+        "status": "accepted",
+        "successor": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+        "score": 0.006682085403589055,
+        "reason": "displacement 48662 m vs projected 48989 m over 324 s (ratio 0.993, within +/-5%)",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 0.006682085403589055,
+            "measurements": {
+              "dt_s": 324.1879999637604,
+              "displacement_m": 48662.002872855424,
+              "projected_m": 48989.35391961293,
+              "ratio": 0.993317914596411
+            }
+          },
+          {
+            "tracklet_id": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+            "score": 0.013116133903216087,
+            "measurements": {
+              "dt_s": 121.59999990463257,
+              "displacement_m": 18134.450504303237,
+              "projected_m": 18375.46557126995,
+              "ratio": 0.9868838660967839
+            }
+          },
+          {
+            "tracklet_id": "tracklet-1d397900-b14a-53fe-12ba-345ed48f2666",
+            "score": 0.048078366141314,
+            "measurements": {
+              "dt_s": 120.98799991607666,
+              "displacement_m": 17403.967800204493,
+              "projected_m": 18282.983788966114,
+              "ratio": 0.951921633858686
+            }
+          },
+          {
+            "tracklet_id": "tracklet-2db24cf0-2215-64db-94cc-a7defed7f98a",
+            "score": 0.06060764801211205,
+            "measurements": {
+              "dt_s": 106.79099988937378,
+              "displacement_m": 17115.681023767826,
+              "projected_m": 16137.617954997402,
+              "ratio": 1.060607648012112
+            }
+          },
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 0.09209244732717525,
+            "measurements": {
+              "dt_s": 324.1870000362396,
+              "displacement_m": 44477.6672365569,
+              "projected_m": 48989.20281653936,
+              "ratio": 0.9079075526728247
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-0cf33031-615b-c30f-0fa5-b16619688f2f",
+        "status": "accepted",
+        "successor": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+        "score": 0.03084407126436639,
+        "reason": "displacement 15169 m vs projected 15652 m over 116 s (ratio 0.969, within +/-5%)",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+            "score": 0.03084407126436639,
+            "measurements": {
+              "dt_s": 115.94600009918213,
+              "displacement_m": 15169.155940913048,
+              "projected_m": 15651.925032025358,
+              "ratio": 0.9691559287356336
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.03707684413368639,
+            "measurements": {
+              "dt_s": 345.81300020217896,
+              "displacement_m": 44951.57721293824,
+              "projected_m": 46682.413792922685,
+              "ratio": 0.9629231558663136
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.03879364911078775,
+            "measurements": {
+              "dt_s": 337.2720000743866,
+              "displacement_m": 43763.183612545305,
+              "projected_m": 45529.43660022634,
+              "ratio": 0.9612063508892122
+            }
+          },
+          {
+            "tracklet_id": "tracklet-2b7e0c4f-065a-e882-8d2b-67110927b0d6",
+            "score": 0.04162839078159786,
+            "measurements": {
+              "dt_s": 130.44000005722046,
+              "displacement_m": 16875.502676072876,
+              "projected_m": 17608.516898612696,
+              "ratio": 0.9583716092184021
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 0.1326296533779303,
+            "measurements": {
+              "dt_s": 354.4340000152588,
+              "displacement_m": 54192.01404992394,
+              "projected_m": 47846.190401516375,
+              "ratio": 1.1326296533779303
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "closest candidate 876dc149 has ratio 0.884, outside +/-5%",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.11631170986926953,
+            "measurements": {
+              "dt_s": 104.7240002155304,
+              "displacement_m": 13621.04175937191,
+              "projected_m": 15413.853404526668,
+              "ratio": 0.8836882901307305
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.12323739625355834,
+            "measurements": {
+              "dt_s": 96.18300008773804,
+              "displacement_m": 12412.10206942359,
+              "projected_m": 14156.742106000167,
+              "ratio": 0.8767626037464417
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 0.7835595373389419,
+            "measurements": {
+              "dt_s": 113.34500002861023,
+              "displacement_m": 29754.659137071496,
+              "projected_m": 16682.739496022226,
+              "ratio": 1.783559537338942
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 0.9392327830428737,
+            "measurements": {
+              "dt_s": 94.22500014305115,
+              "displacement_m": 26894.352480705016,
+              "projected_m": 13868.552922514418,
+              "ratio": 1.9392327830428737
+            }
+          },
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 1.2557452444426027,
+            "measurements": {
+              "dt_s": 94.2240002155304,
+              "displacement_m": 31283.590313354853,
+              "projected_m": 13868.405747691186,
+              "ratio": 2.2557452444426027
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-2db24cf0-2215-64db-94cc-a7defed7f98a",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "every candidate within +/-5% (best 5e77b4e1) was already accepted by a source with a closer ratio (aa82aa85)",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 0.033932499372095526,
+            "measurements": {
+              "dt_s": 109.34100008010864,
+              "displacement_m": 15525.415307347113,
+              "projected_m": 15015.888674333826,
+              "ratio": 1.0339324993720955
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 0.058363960946403615,
+            "measurements": {
+              "dt_s": 128.46199989318848,
+              "displacement_m": 16612.146355221183,
+              "projected_m": 17641.791165849427,
+              "ratio": 0.9416360390535964
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.6448883326973032,
+            "measurements": {
+              "dt_s": 119.84100008010864,
+              "displacement_m": 27071.345569508165,
+              "projected_m": 16457.86223379451,
+              "ratio": 1.6448883326973032
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.6983363656122588,
+            "measurements": {
+              "dt_s": 111.29999995231628,
+              "displacement_m": 25958.9350122829,
+              "projected_m": 15284.919723734805,
+              "ratio": 1.6983363656122588
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 1.0807512117946692,
+            "measurements": {
+              "dt_s": 109.3420000076294,
+              "displacement_m": 31244.614285843036,
+              "projected_m": 15016.02599519538,
+              "ratio": 2.080751211794669
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-88a1d73d-4188-2250-25aa-25325111de11",
+        "status": "accepted",
+        "successor": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+        "score": 0.046284190818830284,
+        "reason": "displacement 15334 m vs projected 16078 m over 94 s (ratio 0.954, within +/-5%)",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.046284190818830284,
+            "measurements": {
+              "dt_s": 94.41299986839294,
+              "displacement_m": 15333.628256497683,
+              "projected_m": 16077.775065574988,
+              "ratio": 0.9537158091811697
+            }
+          },
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 0.06442584377393612,
+            "measurements": {
+              "dt_s": 86.15399980545044,
+              "displacement_m": 13726.120678643687,
+              "projected_m": 14671.333733728135,
+              "ratio": 0.9355741562260639
+            }
+          },
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 0.08746160176889961,
+            "measurements": {
+              "dt_s": 92.4539999961853,
+              "displacement_m": 14367.1625314631,
+              "projected_m": 15744.173132125687,
+              "ratio": 0.9125383982311004
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.119682521364609,
+            "measurements": {
+              "dt_s": 102.9539999961853,
+              "displacement_m": 15433.936204179932,
+              "projected_m": 17532.238741987247,
+              "ratio": 0.880317478635391
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 0.3090235216859296,
+            "measurements": {
+              "dt_s": 92.45499992370605,
+              "displacement_m": 10878.970964015516,
+              "projected_m": 15744.343411745896,
+              "ratio": 0.6909764783140704
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-2b7e0c4f-065a-e882-8d2b-67110927b0d6",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "closest candidate 7afdc09c has ratio 1.094, outside +/-5%",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.09436041669751472,
+            "measurements": {
+              "dt_s": 95.39299988746643,
+              "displacement_m": 12360.734146267212,
+              "projected_m": 11294.938996028915,
+              "ratio": 1.0943604166975147
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.10118470252093448,
+            "measurements": {
+              "dt_s": 103.93400001525879,
+              "displacement_m": 13551.432138364493,
+              "projected_m": 12306.22992431814,
+              "ratio": 1.1011847025209345
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 1.2554548689790046,
+            "measurements": {
+              "dt_s": 112.55499982833862,
+              "displacement_m": 30058.431605589623,
+              "projected_m": 13326.993157347646,
+              "ratio": 2.2554548689790046
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 1.4341461459407312,
+            "measurements": {
+              "dt_s": 93.43499994277954,
+              "displacement_m": 26929.210581244835,
+              "projected_m": 11063.103432040409,
+              "ratio": 2.434146145940731
+            }
+          },
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 1.8574126876106587,
+            "measurements": {
+              "dt_s": 93.43400001525879,
+              "displacement_m": 31611.5138057054,
+              "projected_m": 11062.985036347216,
+              "ratio": 2.8574126876106587
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-1d397900-b14a-53fe-12ba-345ed48f2666",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "every candidate within +/-5% (best 5e77b4e1) was already accepted by a source with a closer ratio (aa82aa85)",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 0.04622151561055432,
+            "measurements": {
+              "dt_s": 98.21500015258789,
+              "displacement_m": 14946.268508607967,
+              "projected_m": 14285.950236729379,
+              "ratio": 1.0462215156105543
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 0.07819748889706701,
+            "measurements": {
+              "dt_s": 117.33599996566772,
+              "displacement_m": 15732.599135372091,
+              "projected_m": 17067.2122779836,
+              "ratio": 0.921802511102933
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.6094385333168177,
+            "measurements": {
+              "dt_s": 108.71500015258789,
+              "displacement_m": 25450.43309205603,
+              "projected_m": 15813.237079397128,
+              "ratio": 1.6094385333168177
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.6710396927372291,
+            "measurements": {
+              "dt_s": 100.17400002479553,
+              "displacement_m": 24348.549428524755,
+              "projected_m": 14570.898306216095,
+              "ratio": 1.671039692737229
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 1.0757136956765296,
+            "measurements": {
+              "dt_s": 98.21600008010864,
+              "displacement_m": 29653.84446503178,
+              "projected_m": 14286.095682076622,
+              "ratio": 2.0757136956765296
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "every candidate within +/-5% (best df01c8a9) was already accepted by a source with a closer ratio (cc1e490a)",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 0.016423441391055005,
+            "measurements": {
+              "dt_s": 89.13100004196167,
+              "displacement_m": 13471.72690617925,
+              "projected_m": 13696.673419334105,
+              "ratio": 0.983576558608945
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 0.21088332680768307,
+            "measurements": {
+              "dt_s": 108.25099992752075,
+              "displacement_m": 20142.832312270744,
+              "projected_m": 16634.825062274478,
+              "ratio": 1.210883326807683
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.6291856603521386,
+            "measurements": {
+              "dt_s": 99.63000011444092,
+              "displacement_m": 5677.184030279336,
+              "projected_m": 15310.044470423105,
+              "ratio": 0.3708143396478614
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.6404460140263599,
+            "measurements": {
+              "dt_s": 91.08899998664856,
+              "displacement_m": 5032.877539735156,
+              "projected_m": 13997.557351802327,
+              "ratio": 0.35955398597364
+            }
+          },
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 0.6578458424120346,
+            "measurements": {
+              "dt_s": 89.13000011444092,
+              "displacement_m": 22706.7183420375,
+              "projected_m": 13696.519761452018,
+              "ratio": 1.6578458424120346
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "no tracklet starts after this one ends",
+        "candidates": []
+      },
+      {
+        "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "no tracklet starts after this one ends",
+        "candidates": []
+      },
+      {
+        "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "no tracklet starts after this one ends",
+        "candidates": []
+      },
+      {
+        "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "no tracklet starts after this one ends",
+        "candidates": []
+      },
+      {
+        "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "no tracklet starts after this one ends",
+        "candidates": []
+      },
+      {
+        "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "no tracklet starts after this one ends",
+        "candidates": []
+      }
+    ],
+    "gaussian": [
+      {
+        "tracklet_id": "tracklet-aa82aa85-67bd-e4fe-cc6e-5e0d9ae7e648",
+        "status": "accepted",
+        "successor": "tracklet-1d397900-b14a-53fe-12ba-345ed48f2666",
+        "score": 0.35030629509454314,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.350 (no-match 1.0), gap 346 s, altitude difference 104 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-1d397900-b14a-53fe-12ba-345ed48f2666",
+            "score": 0.35030629509454314,
+            "measurements": {
+              "plausibility": 0.01549252546508488,
+              "heading": 5.389586565041071e-06,
+              "vel_cos": 0.00039014669648163025,
+              "vel_w2": 4.958555182047114,
+              "pos_w2": 63235.21185757217,
+              "alt_w2": 103.52307475428094,
+              "dt": 346.4609999656677
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 0.5972120616885317,
+            "measurements": {
+              "plausibility": 0.013606145542694667,
+              "heading": 5.83167947054708e-06,
+              "vel_cos": 0.0015470480169019751,
+              "vel_w2": 68.58199300304203,
+              "pos_w2": 92340.0824613256,
+              "alt_w2": 16.261613332602458,
+              "dt": 568.7809998989105
+            }
+          },
+          {
+            "tracklet_id": "tracklet-315a4e10-21ea-1e4a-04a7-5767800d1788",
+            "score": 0.7631139539309736,
+            "measurements": {
+              "plausibility": 0.03862221892447993,
+              "heading": 1.0827707914495832e-05,
+              "vel_cos": 0.0037451907752361624,
+              "vel_w2": 39.1256859782809,
+              "pos_w2": 31192.107782930023,
+              "alt_w2": 1045.6265860337269,
+              "dt": 113.8289999961853
+            }
+          },
+          {
+            "tracklet_id": "tracklet-2db24cf0-2215-64db-94cc-a7defed7f98a",
+            "score": 0.9108488514875617,
+            "measurements": {
+              "plausibility": 0.030507240390865886,
+              "heading": 0.0003132962083089996,
+              "vel_cos": 0.0015406346089132938,
+              "vel_w2": 9.485592290197793,
+              "pos_w2": 61706.141837208546,
+              "alt_w2": 1183.4307722978233,
+              "dt": 332.26399993896484
+            }
+          },
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 1.1433192688148563,
+            "measurements": {
+              "plausibility": 0.03197542512801611,
+              "heading": 0.0005591327270907387,
+              "vel_cos": 0.001450866038912757,
+              "vel_w2": 7.871709081971405,
+              "pos_w2": 94089.07531356844,
+              "alt_w2": 1267.8866486808154,
+              "dt": 549.6600000858307
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-97c73082-2aab-0792-5643-9cd74024ea78",
+        "status": "accepted",
+        "successor": "tracklet-0cf33031-615b-c30f-0fa5-b16619688f2f",
+        "score": 0.16691389978873608,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.167 (no-match 1.0), gap 108 s, altitude difference 121 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-0cf33031-615b-c30f-0fa5-b16619688f2f",
+            "score": 0.16691389978873608,
+            "measurements": {
+              "plausibility": 0.006285728895532823,
+              "heading": 1.3566417783938967e-05,
+              "vel_cos": 0.00018485414163327274,
+              "vel_w2": 8.15822344160695,
+              "pos_w2": 28439.62972673283,
+              "alt_w2": 120.55768047808019,
+              "dt": 108.44899988174438
+            }
+          },
+          {
+            "tracklet_id": "tracklet-2b7e0c4f-065a-e882-8d2b-67110927b0d6",
+            "score": 0.36471663231685214,
+            "measurements": {
+              "plausibility": 0.00398128724609477,
+              "heading": 3.8340500075784156e-05,
+              "vel_cos": 0.0008333081459210856,
+              "vel_w2": 6.856208502812222,
+              "pos_w2": 58162.7168377521,
+              "alt_w2": 167.13993506983073,
+              "dt": 324.1199998855591
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.5542662871991122,
+            "measurements": {
+              "plausibility": 0.0028151281133782092,
+              "heading": 0.00017730048731856574,
+              "vel_cos": 0.0024371793984684365,
+              "vel_w2": 13.645527758492026,
+              "pos_w2": 86162.84100666254,
+              "alt_w2": 60.29768746495066,
+              "dt": 539.4930000305176
+            }
+          },
+          {
+            "tracklet_id": "tracklet-4988f186-83b6-51e6-b59d-513774b5e61e",
+            "score": 0.8288132394176334,
+            "measurements": {
+              "plausibility": 0.017936315194618285,
+              "heading": 2.1483747872808046e-05,
+              "vel_cos": 6.066222581591063e-05,
+              "vel_w2": 7.6483307317380635,
+              "pos_w2": 26851.08749684954,
+              "alt_w2": 1665.7747008844135,
+              "dt": 89.62399983406067
+            }
+          },
+          {
+            "tracklet_id": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+            "score": 0.9380592954844262,
+            "measurements": {
+              "plausibility": 0.21897943435373357,
+              "heading": 0.0016326655603869922,
+              "vel_cos": 0.0009176837194857512,
+              "vel_w2": 24.954302821821827,
+              "pos_w2": 70412.15180769005,
+              "alt_w2": 161.17311532819338,
+              "dt": 326.4059998989105
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-4109defd-9f18-83c1-2830-44c7dfb2c828",
+        "status": "accepted",
+        "successor": "tracklet-315a4e10-21ea-1e4a-04a7-5767800d1788",
+        "score": 0.33073929682809156,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.331 (no-match 1.0), gap 104 s, altitude difference 14 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-315a4e10-21ea-1e4a-04a7-5767800d1788",
+            "score": 0.33073929682809156,
+            "measurements": {
+              "plausibility": 0.05489016243560594,
+              "heading": 0.00032790557524975394,
+              "vel_cos": 0.0020853611879750877,
+              "vel_w2": 37.1084450745298,
+              "pos_w2": 28922.171646872393,
+              "alt_w2": 13.653585427600515,
+              "dt": 103.89199995994568
+            }
+          },
+          {
+            "tracklet_id": "tracklet-2db24cf0-2215-64db-94cc-a7defed7f98a",
+            "score": 0.4478589748982278,
+            "measurements": {
+              "plausibility": 0.045121826662992984,
+              "heading": 0.00030427349992812047,
+              "vel_cos": 0.0005708498544978458,
+              "vel_w2": 7.445294359624888,
+              "pos_w2": 59444.3282517035,
+              "alt_w2": 151.31985839681758,
+              "dt": 322.3269999027252
+            }
+          },
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 0.6499282215385893,
+            "measurements": {
+              "plausibility": 0.04605292264456506,
+              "heading": 0.00032841092715518716,
+              "vel_cos": 0.0005089913895829357,
+              "vel_w2": 7.839849436528382,
+              "pos_w2": 91826.23752582046,
+              "alt_w2": 235.7275869435824,
+              "dt": 539.7230000495911
+            }
+          },
+          {
+            "tracklet_id": "tracklet-1d397900-b14a-53fe-12ba-345ed48f2666",
+            "score": 0.792013297961388,
+            "measurements": {
+              "plausibility": 0.02980225790612804,
+              "heading": 1.226056573488954e-06,
+              "vel_cos": 2.1452591224213613e-05,
+              "vel_w2": 4.221553392548425,
+              "pos_w2": 60944.41783905809,
+              "alt_w2": 1135.4029248615384,
+              "dt": 336.5239999294281
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 1.0141076226441272,
+            "measurements": {
+              "plausibility": 0.027079493135026278,
+              "heading": 1.1891997468427284e-05,
+              "vel_cos": 0.0005846512316213248,
+              "vel_w2": 72.35206202454273,
+              "pos_w2": 90047.74935385646,
+              "alt_w2": 1016.3568061539792,
+              "dt": 558.8439998626709
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-095baef0-86b8-25d4-772a-0343dbd5755c",
+        "status": "accepted",
+        "successor": "tracklet-cc1e490a-83fb-f504-5bdd-7f0cff962a0a",
+        "score": 0.16247061904187313,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.162 (no-match 1.0), gap 105 s, altitude difference 144 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-cc1e490a-83fb-f504-5bdd-7f0cff962a0a",
+            "score": 0.16247061904187313,
+            "measurements": {
+              "plausibility": 0.00043558004593461936,
+              "heading": 1.427986514013213e-05,
+              "vel_cos": 7.481647621321308e-06,
+              "vel_w2": 7.462649374276652,
+              "pos_w2": 32125.125720088305,
+              "alt_w2": 143.75596260410111,
+              "dt": 105.46499991416931
+            }
+          },
+          {
+            "tracklet_id": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+            "score": 0.363983845268544,
+            "measurements": {
+              "plausibility": 0.0019342553465796443,
+              "heading": 1.1912155056581497e-05,
+              "vel_cos": 0.00017091610669550672,
+              "vel_w2": 9.155654016045576,
+              "pos_w2": 66879.50770466117,
+              "alt_w2": 200.9429821445363,
+              "dt": 329.5479998588562
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 0.5063752397064251,
+            "measurements": {
+              "plausibility": 0.002839465892988521,
+              "heading": 4.107931200536541e-05,
+              "vel_cos": 0.0008039333361228307,
+              "vel_w2": 7.53610629918421,
+              "pos_w2": 94781.0693757622,
+              "alt_w2": 130.94753025386728,
+              "dt": 532.135999917984
+            }
+          },
+          {
+            "tracklet_id": "tracklet-2b7e0c4f-065a-e882-8d2b-67110927b0d6",
+            "score": 1.0975603102852622,
+            "measurements": {
+              "plausibility": 0.22463574365271835,
+              "heading": 0.002533297943518864,
+              "vel_cos": 0.002214127205417249,
+              "vel_w2": 24.222805272344747,
+              "pos_w2": 54783.399545217995,
+              "alt_w2": 129.4674734747194,
+              "dt": 327.26199984550476
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 1.204031745187546,
+            "measurements": {
+              "plausibility": 0.1910101341309122,
+              "heading": 0.002387715806911994,
+              "vel_cos": 0.0043760569096673585,
+              "vel_w2": 23.842341932139597,
+              "pos_w2": 82784.70473285105,
+              "alt_w2": 18.569832536440916,
+              "dt": 542.6349999904633
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-c0fe73d2-c2bc-8fb5-c015-ab06a7132a4f",
+        "status": "accepted",
+        "successor": "tracklet-6ce3a263-0047-5f03-4318-736bf54b9afb",
+        "score": 0.18280983858407024,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.183 (no-match 1.0), gap 103 s, altitude difference 110 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-6ce3a263-0047-5f03-4318-736bf54b9afb",
+            "score": 0.18280983858407024,
+            "measurements": {
+              "plausibility": 0.003663863484563316,
+              "heading": 7.972790302324118e-05,
+              "vel_cos": 0.00044363202929587064,
+              "vel_w2": 13.372472038302488,
+              "pos_w2": 33035.68527106565,
+              "alt_w2": 110.26333968257032,
+              "dt": 103.3289999961853
+            }
+          },
+          {
+            "tracklet_id": "tracklet-88a1d73d-4188-2250-25aa-25325111de11",
+            "score": 0.41361601672399584,
+            "measurements": {
+              "plausibility": 0.0024531155844663916,
+              "heading": 0.00020813778977779585,
+              "vel_cos": 5.781470414256695e-05,
+              "vel_w2": 9.67555371651379,
+              "pos_w2": 71838.79841278534,
+              "alt_w2": 223.97481296424587,
+              "dt": 343.97100019454956
+            }
+          },
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 0.6263297103707883,
+            "measurements": {
+              "plausibility": 0.0026014833225867524,
+              "heading": 0.00028138052463155816,
+              "vel_cos": 2.0086103428518243e-05,
+              "vel_w2": 44.054493246987235,
+              "pos_w2": 104459.56579915334,
+              "alt_w2": 235.61695279056988,
+              "dt": 542.6280000209808
+            }
+          },
+          {
+            "tracklet_id": "tracklet-1d397900-b14a-53fe-12ba-345ed48f2666",
+            "score": 2.5545020415502777,
+            "measurements": {
+              "plausibility": 0.24718536886577785,
+              "heading": 0.008466191752629193,
+              "vel_cos": 0.010276224928549071,
+              "vel_w2": 34.47948522971241,
+              "pos_w2": 58405.113195283215,
+              "alt_w2": 747.9835694302371,
+              "dt": 345.72900009155273
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 2.688555839172197,
+            "measurements": {
+              "plausibility": 0.09177341781268489,
+              "heading": 0.006847971103009831,
+              "vel_cos": 0.0015909726694042226,
+              "vel_w2": 15.85308799845219,
+              "pos_w2": 95078.1015172039,
+              "alt_w2": 2441.232889490171,
+              "dt": 548.9290001392365
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-57e69311-fb16-c4bd-d71d-b6b8583bba9f",
+        "status": "accepted",
+        "successor": "tracklet-4988f186-83b6-51e6-b59d-513774b5e61e",
+        "score": 0.2103072728960761,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.210 (no-match 1.0), gap 104 s, altitude difference 131 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-4988f186-83b6-51e6-b59d-513774b5e61e",
+            "score": 0.2103072728960761,
+            "measurements": {
+              "plausibility": 3.7168553096655695e-05,
+              "heading": 0.00013582339202367066,
+              "vel_cos": 0.0003795160160542377,
+              "vel_w2": 27.87650413294673,
+              "pos_w2": 26664.363458168118,
+              "alt_w2": 130.50271213496612,
+              "dt": 104.34699988365173
+            }
+          },
+          {
+            "tracklet_id": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+            "score": 0.4256665366898744,
+            "measurements": {
+              "plausibility": 0.005742069827304812,
+              "heading": 0.00024306351671421478,
+              "vel_cos": 0.0005577790315389741,
+              "vel_w2": 31.728115292204418,
+              "pos_w2": 57128.76269560277,
+              "alt_w2": 171.57128970565333,
+              "dt": 324.3489999771118
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.5907592093037881,
+            "measurements": {
+              "plausibility": 0.004100636048375792,
+              "heading": 0.0004720147637431449,
+              "vel_cos": 0.0007444202192903315,
+              "vel_w2": 31.484956667261454,
+              "pos_w2": 83653.16295237035,
+              "alt_w2": 92.29934810427031,
+              "dt": 545.6749999523163
+            }
+          },
+          {
+            "tracklet_id": "tracklet-0cf33031-615b-c30f-0fa5-b16619688f2f",
+            "score": 0.8234789636448199,
+            "measurements": {
+              "plausibility": 0.003383099194061882,
+              "heading": 0.00039072483664637225,
+              "vel_cos": 0.0006382058192047069,
+              "vel_w2": 26.847991262130307,
+              "pos_w2": 28246.147240376227,
+              "alt_w2": 1415.0554057106333,
+              "dt": 123.17199993133545
+            }
+          },
+          {
+            "tracklet_id": "tracklet-2b7e0c4f-065a-e882-8d2b-67110927b0d6",
+            "score": 1.0010904469712345,
+            "measurements": {
+              "plausibility": 0.0026570090614129165,
+              "heading": 0.00040119299963647936,
+              "vel_cos": 0.0016433749164138645,
+              "vel_w2": 31.987038056064115,
+              "pos_w2": 57990.37723633273,
+              "alt_w2": 1368.505572684299,
+              "dt": 338.84299993515015
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-6ce3a263-0047-5f03-4318-736bf54b9afb",
+        "status": "accepted",
+        "successor": "tracklet-88a1d73d-4188-2250-25aa-25325111de11",
+        "score": 0.22140982692215477,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.221 (no-match 1.0), gap 144 s, altitude difference 115 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-88a1d73d-4188-2250-25aa-25325111de11",
+            "score": 0.22140982692215477,
+            "measurements": {
+              "plausibility": 0.025116794023192883,
+              "heading": 3.8374282208542e-06,
+              "vel_cos": 0.00018290794616926398,
+              "vel_w2": 9.962994731670937,
+              "pos_w2": 38831.69386542467,
+              "alt_w2": 115.09542367856118,
+              "dt": 144.32500004768372
+            }
+          },
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 0.4280964359986339,
+            "measurements": {
+              "plausibility": 0.021771762522877186,
+              "heading": 4.371380315504325e-07,
+              "vel_cos": 0.00041458620247414313,
+              "vel_w2": 45.2441862695498,
+              "pos_w2": 71448.92167072302,
+              "alt_w2": 129.13317543098313,
+              "dt": 342.981999874115
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 3.0536262099862492,
+            "measurements": {
+              "plausibility": 0.16712217916862626,
+              "heading": 0.010145137386768477,
+              "vel_cos": 0.00035977196296244074,
+              "vel_w2": 15.328291845493233,
+              "pos_w2": 62373.39602243263,
+              "alt_w2": 2332.2423725771264,
+              "dt": 349.2829999923706
+            }
+          },
+          {
+            "tracklet_id": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+            "score": 5.14396721885536,
+            "measurements": {
+              "plausibility": 0.2398814292898158,
+              "heading": 0.023980470223884054,
+              "vel_cos": 0.0011952822833644072,
+              "vel_w2": 20.991644967661628,
+              "pos_w2": 34686.54064553428,
+              "alt_w2": 2402.5642931336847,
+              "dt": 146.6949999332428
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 6.011264911784549,
+            "measurements": {
+              "plausibility": 0.36203245842841636,
+              "heading": 0.028607755424948755,
+              "vel_cos": 0.02004444210124523,
+              "vel_w2": 82.01154098362767,
+              "pos_w2": 55067.766062213945,
+              "alt_w2": 520.1359013474397,
+              "dt": 368.4029998779297
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-4988f186-83b6-51e6-b59d-513774b5e61e",
+        "status": "accepted",
+        "successor": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+        "score": 0.17171755929941052,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.172 (no-match 1.0), gap 120 s, altitude difference 42 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+            "score": 0.17171755929941052,
+            "measurements": {
+              "plausibility": 0.033217016266653604,
+              "heading": 9.177541360205765e-08,
+              "vel_cos": 1.8231838079474372e-05,
+              "vel_w2": 7.467927626587342,
+              "pos_w2": 30480.025071304975,
+              "alt_w2": 41.79383079504225,
+              "dt": 120.06100010871887
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.34430195831047283,
+            "measurements": {
+              "plausibility": 0.0351762983090391,
+              "heading": 5.0399414995183633e-05,
+              "vel_cos": 0.00011947419227553713,
+              "vel_w2": 6.773554215381656,
+              "pos_w2": 56994.564789456424,
+              "alt_w2": 38.218022540091084,
+              "dt": 341.38700008392334
+            }
+          },
+          {
+            "tracklet_id": "tracklet-2b7e0c4f-065a-e882-8d2b-67110927b0d6",
+            "score": 0.8332934201876798,
+            "measurements": {
+              "plausibility": 0.03780952267237981,
+              "heading": 6.114034239768085e-05,
+              "vel_cos": 0.0004558343112217589,
+              "vel_w2": 6.18987765451362,
+              "pos_w2": 31333.713605667075,
+              "alt_w2": 1498.9979761662119,
+              "dt": 134.5550000667572
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 1.1053424219482118,
+            "measurements": {
+              "plausibility": 0.0375661897541342,
+              "heading": 0.00019006367951679426,
+              "vel_cos": 0.0017950729913469576,
+              "vel_w2": 11.567126424520852,
+              "pos_w2": 59346.05758024201,
+              "alt_w2": 1608.2376261841646,
+              "dt": 349.9280002117157
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 1.986445429003581,
+            "measurements": {
+              "plausibility": 0.24472618236572594,
+              "heading": 0.003357859112180561,
+              "vel_cos": 0.0028857775665342977,
+              "vel_w2": 26.03661955651448,
+              "pos_w2": 71507.27611922458,
+              "alt_w2": 1756.5826572461358,
+              "dt": 339.42900013923645
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-315a4e10-21ea-1e4a-04a7-5767800d1788",
+        "status": "accepted",
+        "successor": "tracklet-2db24cf0-2215-64db-94cc-a7defed7f98a",
+        "score": 0.4283609276109436,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.428 (no-match 1.0), gap 124 s, altitude difference 138 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-2db24cf0-2215-64db-94cc-a7defed7f98a",
+            "score": 0.4283609276109436,
+            "measurements": {
+              "plausibility": 0.05725239577661253,
+              "heading": 0.0008240367980980601,
+              "vel_cos": 0.0004901974538408238,
+              "vel_w2": 37.33148233006553,
+              "pos_w2": 30528.87695954902,
+              "alt_w2": 137.81310743335393,
+              "dt": 123.94400000572205
+            }
+          },
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 0.6007071180199984,
+            "measurements": {
+              "plausibility": 0.04408925671969968,
+              "heading": 0.000750303486972248,
+              "vel_cos": 0.0005346251394774404,
+              "vel_w2": 38.78842316510209,
+              "pos_w2": 62924.45279954823,
+              "alt_w2": 222.2629337682374,
+              "dt": 341.3400001525879
+            }
+          },
+          {
+            "tracklet_id": "tracklet-1d397900-b14a-53fe-12ba-345ed48f2666",
+            "score": 1.3706149263700218,
+            "measurements": {
+              "plausibility": 0.091071995918263,
+              "heading": 0.0035681515234581296,
+              "vel_cos": 0.0017203725067267417,
+              "vel_w2": 39.34118494219678,
+              "pos_w2": 32046.496712690605,
+              "alt_w2": 1148.8818310766792,
+              "dt": 138.14100003242493
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 1.4541414137365596,
+            "measurements": {
+              "plausibility": 0.07260590797596216,
+              "heading": 0.0034981050220901366,
+              "vel_cos": 0.0005060828120861949,
+              "vel_w2": 70.68537881850685,
+              "pos_w2": 61148.812385184145,
+              "alt_w2": 1029.8286646352349,
+              "dt": 360.4609999656677
+            }
+          },
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 7.5279301077039245,
+            "measurements": {
+              "plausibility": 0.25935502789277554,
+              "heading": 0.039589417185690645,
+              "vel_cos": 0.020656585883401024,
+              "vel_w2": 49.33215511297623,
+              "pos_w2": 78618.05475551418,
+              "alt_w2": 636.3681734080787,
+              "dt": 335.039999961853
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-cc1e490a-83fb-f504-5bdd-7f0cff962a0a",
+        "status": "accepted",
+        "successor": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+        "score": 0.16813081090473525,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.168 (no-match 1.0), gap 122 s, altitude difference 58 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+            "score": 0.16813081090473525,
+            "measurements": {
+              "plausibility": 0.017301465799958855,
+              "heading": 2.412818759012225e-06,
+              "vel_cos": 0.00011971369146968058,
+              "vel_w2": 11.233581286890468,
+              "pos_w2": 34757.37348942758,
+              "alt_w2": 57.55526205281199,
+              "dt": 121.59999990463257
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 0.3152944619673967,
+            "measurements": {
+              "plausibility": 0.01467301328929686,
+              "heading": 3.7978213713762976e-05,
+              "vel_cos": 0.0007036096282945214,
+              "vel_w2": 9.183188985846792,
+              "pos_w2": 62656.4734280226,
+              "alt_w2": 12.836814882333693,
+              "dt": 324.1879999637604
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 2.0291837842881413,
+            "measurements": {
+              "plausibility": 0.34546972362701156,
+              "heading": 0.007004729738614657,
+              "vel_cos": 0.004614276732084144,
+              "vel_w2": 26.31810764993093,
+              "pos_w2": 50805.67417566188,
+              "alt_w2": 162.15147438456896,
+              "dt": 334.6870000362396
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 2.4526594667903003,
+            "measurements": {
+              "plausibility": 0.34695775859921396,
+              "heading": 0.006071923702576032,
+              "vel_cos": 0.001193545099008153,
+              "vel_w2": 25.200508801486055,
+              "pos_w2": 48440.69516300194,
+              "alt_w2": 1731.1978849938228,
+              "dt": 326.14599990844727
+            }
+          },
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 3.069564268889675,
+            "measurements": {
+              "plausibility": 0.1519794540746171,
+              "heading": 0.00969703447399739,
+              "vel_cos": 0.004237638222751694,
+              "vel_w2": 52.897488174897035,
+              "pos_w2": 72509.40902141565,
+              "alt_w2": 2218.698974337215,
+              "dt": 317.88699984550476
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-0cf33031-615b-c30f-0fa5-b16619688f2f",
+        "status": "accepted",
+        "successor": "tracklet-2b7e0c4f-065a-e882-8d2b-67110927b0d6",
+        "score": 0.16188734220879492,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.162 (no-match 1.0), gap 130 s, altitude difference 47 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-2b7e0c4f-065a-e882-8d2b-67110927b0d6",
+            "score": 0.16188734220879492,
+            "measurements": {
+              "plausibility": 0.010112203363708988,
+              "heading": 2.483994496671471e-05,
+              "vel_cos": 0.00023350117654974412,
+              "vel_w2": 10.168471371719706,
+              "pos_w2": 29765.425011596588,
+              "alt_w2": 46.598043603346575,
+              "dt": 130.44000005722046
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.35422543999270056,
+            "measurements": {
+              "plausibility": 0.006474379908592643,
+              "heading": 2.0087408297286835e-05,
+              "vel_cos": 0.0012983280393210617,
+              "vel_w2": 9.073019955278184,
+              "pos_w2": 57773.454993116204,
+              "alt_w2": 67.9113721585211,
+              "dt": 345.81300020217896
+            }
+          },
+          {
+            "tracklet_id": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+            "score": 0.8488417538138728,
+            "measurements": {
+              "plausibility": 0.026353264081280112,
+              "heading": 0.00018922664321419091,
+              "vel_cos": 5.612995423120992e-06,
+              "vel_w2": 7.67780416315283,
+              "pos_w2": 28926.226154140386,
+              "alt_w2": 1586.5211947199082,
+              "dt": 115.94600009918213
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.9275444287342355,
+            "measurements": {
+              "plausibility": 0.01033144383529556,
+              "heading": 6.446321708653002e-06,
+              "vel_cos": 3.563951259111242e-05,
+              "vel_w2": 7.56651353475216,
+              "pos_w2": 55419.52198705694,
+              "alt_w2": 1507.3291274282062,
+              "dt": 337.2720000743866
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 1.602408312655065,
+            "measurements": {
+              "plausibility": 0.2918079317026069,
+              "heading": 0.004658997137965137,
+              "vel_cos": 0.003542929985835719,
+              "vel_w2": 26.758087668574724,
+              "pos_w2": 69966.08204062455,
+              "alt_w2": 211.28620551038384,
+              "dt": 335.3140001296997
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-49d28583-b279-1634-9773-2800a9349669",
+        "status": "accepted",
+        "successor": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+        "score": 0.15526154274948006,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.155 (no-match 1.0), gap 96 s, altitude difference 80 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.15526154274948006,
+            "measurements": {
+              "plausibility": 0.012481412941708325,
+              "heading": 0.00012943912925977852,
+              "vel_cos": 6.513004005348488e-05,
+              "vel_w2": 2.834450950085306,
+              "pos_w2": 26551.690929618988,
+              "alt_w2": 79.64818495779535,
+              "dt": 96.18300008773804
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.9557283379038845,
+            "measurements": {
+              "plausibility": 0.009418974706465395,
+              "heading": 0.0005964182414740504,
+              "vel_cos": 0.0014554188189658257,
+              "vel_w2": 12.428628599793575,
+              "pos_w2": 28891.682349280753,
+              "alt_w2": 1649.3418695643277,
+              "dt": 104.7240002155304
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 3.7458326859099156,
+            "measurements": {
+              "plausibility": 0.7926248953785278,
+              "heading": 0.01095604601908573,
+              "vel_cos": 0.0033506606190425448,
+              "vel_w2": 26.58447835619388,
+              "pos_w2": 41232.82563870264,
+              "alt_w2": 1797.60593563358,
+              "dt": 94.22500014305115
+            }
+          },
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 9.526672659742337,
+            "measurements": {
+              "plausibility": 1.152347778403834,
+              "heading": 0.04853050545648041,
+              "vel_cos": 0.009290754549299174,
+              "vel_w2": 67.3845870117842,
+              "pos_w2": 52030.60915768983,
+              "alt_w2": 408.35216381441774,
+              "dt": 87.92400002479553
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 40.82425304397596,
+            "measurements": {
+              "plausibility": 0.7184382793075413,
+              "heading": 0.25458814811918473,
+              "vel_cos": 0.0471931650697377,
+              "vel_w2": 79.80412187566839,
+              "pos_w2": 40528.204583583436,
+              "alt_w2": 14.719491016364826,
+              "dt": 113.34500002861023
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-2db24cf0-2215-64db-94cc-a7defed7f98a",
+        "status": "accepted",
+        "successor": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+        "score": 0.17143265056835594,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.171 (no-match 1.0), gap 109 s, altitude difference 85 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 0.17143265056835594,
+            "measurements": {
+              "plausibility": 0.024802760169963807,
+              "heading": 1.6315603930672218e-05,
+              "vel_cos": 6.984345137017733e-06,
+              "vel_w2": 5.45909385820698,
+              "pos_w2": 32402.926844568447,
+              "alt_w2": 84.50663601481268,
+              "dt": 109.34100008010864
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 1.4465124528153002,
+            "measurements": {
+              "plausibility": 0.046541060878213206,
+              "heading": 0.004534079079137832,
+              "vel_cos": 3.7511773240961332e-06,
+              "vel_w2": 71.0175933678605,
+              "pos_w2": 30683.560471460987,
+              "alt_w2": 1167.6374945850712,
+              "dt": 128.46199989318848
+            }
+          },
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 13.95083528821741,
+            "measurements": {
+              "plausibility": 0.8571222629221076,
+              "heading": 0.07863562429736837,
+              "vel_cos": 0.014813802520513897,
+              "vel_w2": 60.543337611701354,
+              "pos_w2": 49529.88517542297,
+              "alt_w2": 774.1779827043168,
+              "dt": 103.04099988937378
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 33.777000236359214,
+            "measurements": {
+              "plausibility": 0.7330286833015415,
+              "heading": 0.20372546962684035,
+              "vel_cos": 0.025643743097716776,
+              "vel_w2": 35.66986463156371,
+              "pos_w2": 43068.307652048534,
+              "alt_w2": 2979.9440761581304,
+              "dt": 109.3420000076294
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 66.94923316624343,
+            "measurements": {
+              "plausibility": 0.5002142407918145,
+              "heading": 0.41960149035673866,
+              "vel_cos": 0.06420074054595548,
+              "vel_w2": 50.4162099510727,
+              "pos_w2": 35868.17526877086,
+              "alt_w2": 2831.630320113273,
+              "dt": 119.84100008010864
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-88a1d73d-4188-2250-25aa-25325111de11",
+        "status": "accepted",
+        "successor": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+        "score": 0.1753980791880677,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.175 (no-match 1.0), gap 86 s, altitude difference 22 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 0.1753980791880677,
+            "measurements": {
+              "plausibility": 0.0011590567040252794,
+              "heading": 0.00020722448320120712,
+              "vel_cos": 5.339266370629758e-05,
+              "vel_w2": 40.97121108075313,
+              "pos_w2": 32622.175225956784,
+              "alt_w2": 21.637752282447007,
+              "dt": 86.15399980545044
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 12.886903541179102,
+            "measurements": {
+              "plausibility": 0.2884527159797741,
+              "heading": 0.07606747699516336,
+              "vel_cos": 0.0010425711840029717,
+              "vel_w2": 11.899553331863224,
+              "pos_w2": 24617.23015793384,
+              "alt_w2": 2217.411998949778,
+              "dt": 92.45499992370605
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 37.43091788897185,
+            "measurements": {
+              "plausibility": 0.45785771506805995,
+              "heading": 0.2395401381060578,
+              "vel_cos": 0.016413674878754114,
+              "vel_w2": 77.7139126320207,
+              "pos_w2": 19642.761305269745,
+              "alt_w2": 405.16908784402847,
+              "dt": 111.57499980926514
+            }
+          },
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 43.375935105110266,
+            "measurements": {
+              "plausibility": 0.0379992320010324,
+              "heading": 0.2823449714464116,
+              "vel_cos": 0.016176293252716523,
+              "vel_w2": 35.24748557539226,
+              "pos_w2": 22562.81321418816,
+              "alt_w2": 847.0550744283846,
+              "dt": 92.4539999961853
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 68.0358588750588,
+            "measurements": {
+              "plausibility": 0.0598655751523684,
+              "heading": 0.4430323238455901,
+              "vel_cos": 0.015926746249254164,
+              "vel_w2": 39.155244816890566,
+              "pos_w2": 17993.22953770707,
+              "alt_w2": 2069.056712227187,
+              "dt": 102.9539999961853
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-2b7e0c4f-065a-e882-8d2b-67110927b0d6",
+        "status": "accepted",
+        "successor": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+        "score": 0.17708909019053415,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.177 (no-match 1.0), gap 104 s, altitude difference 113 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 0.17708909019053415,
+            "measurements": {
+              "plausibility": 0.010705586032728117,
+              "heading": 5.527695337015359e-07,
+              "vel_cos": 0.00047219492971417587,
+              "vel_w2": 10.967237685539132,
+              "pos_w2": 28014.763547374383,
+              "alt_w2": 112.75364210423452,
+              "dt": 103.93400001525879
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 0.7597967617387209,
+            "measurements": {
+              "plausibility": 0.007238530508620787,
+              "heading": 0.0002245194172275644,
+              "vel_cos": 0.00022385005818226222,
+              "vel_w2": 4.230390455328827,
+              "pos_w2": 25664.627990187346,
+              "alt_w2": 1460.7824496714973,
+              "dt": 95.39299988746643
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 4.037716964716868,
+            "measurements": {
+              "plausibility": 0.7876619320622428,
+              "heading": 0.01688662352888215,
+              "vel_cos": 0.005591652077037712,
+              "vel_w2": 28.643557227614313,
+              "pos_w2": 40418.74833220594,
+              "alt_w2": 257.8836142411245,
+              "dt": 93.43499994277954
+            }
+          },
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 12.040564580722325,
+            "measurements": {
+              "plausibility": 1.1545774320902633,
+              "heading": 0.06015991588721803,
+              "vel_cos": 0.012835898748924213,
+              "vel_w2": 68.09316837906621,
+              "pos_w2": 51329.39102258108,
+              "alt_w2": 1948.1717826910226,
+              "dt": 87.13399982452393
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 46.34068273168151,
+            "measurements": {
+              "plausibility": 0.7259254987080402,
+              "heading": 0.2853962753223903,
+              "vel_cos": 0.05476534796174737,
+              "vel_w2": 78.60729409813926,
+              "pos_w2": 40106.057477295624,
+              "alt_w2": 1554.6683703466351,
+              "dt": 112.55499982833862
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-1d397900-b14a-53fe-12ba-345ed48f2666",
+        "status": "accepted",
+        "successor": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+        "score": 0.31596977967094286,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.316 (no-match 1.0), gap 117 s, altitude difference 119 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 0.31596977967094286,
+            "measurements": {
+              "plausibility": 0.013272351498855294,
+              "heading": 0.00029090027062206314,
+              "vel_cos": 0.00038742069799513335,
+              "vel_w2": 70.03208900210231,
+              "pos_w2": 29114.638081999907,
+              "alt_w2": 119.10011922116921,
+              "dt": 117.33599996566772
+            }
+          },
+          {
+            "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+            "score": 1.1604593625422979,
+            "measurements": {
+              "plausibility": 0.09603893961448824,
+              "heading": 0.002262825208906638,
+              "vel_cos": 0.0003376160479784396,
+              "vel_w2": 4.871812427055683,
+              "pos_w2": 30953.37250033691,
+              "alt_w2": 1371.1304776169436,
+              "dt": 98.21500015258789
+            }
+          },
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 11.42939232090901,
+            "measurements": {
+              "plausibility": 0.9271910116970058,
+              "heading": 0.06284216581869928,
+              "vel_cos": 0.010493269517267145,
+              "vel_w2": 60.273728016422844,
+              "pos_w2": 47622.08586767225,
+              "alt_w2": 512.6331856807308,
+              "dt": 91.91499996185303
+            }
+          },
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 30.160768096424974,
+            "measurements": {
+              "plausibility": 0.7812373525782885,
+              "heading": 0.1840836934469895,
+              "vel_cos": 0.01985260213886242,
+              "vel_w2": 32.94736056986575,
+              "pos_w2": 41034.507574999196,
+              "alt_w2": 1693.2612509993903,
+              "dt": 98.21600008010864
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 64.16612402872113,
+            "measurements": {
+              "plausibility": 0.5277573141209425,
+              "heading": 0.4064363910901745,
+              "vel_cos": 0.05487068952987162,
+              "vel_w2": 45.29846678520462,
+              "pos_w2": 33852.88825193028,
+              "alt_w2": 1545.0347726570826,
+              "dt": 108.71500015258789
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-427cd703-137f-d425-6a75-58ab09bd0bd1",
+        "status": "accepted",
+        "successor": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+        "score": 0.14364889815382068,
+        "reason": "chosen in the lowest-total-cost assignment: cost 0.144 (no-match 1.0), gap 89 s, altitude difference 70 m",
+        "candidates": [
+          {
+            "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+            "score": 0.14364889815382068,
+            "measurements": {
+              "plausibility": 0.012406657520025701,
+              "heading": 1.379714005267374e-06,
+              "vel_cos": 0.0002474024822033405,
+              "vel_w2": 10.163373948315682,
+              "pos_w2": 27920.11116559335,
+              "alt_w2": 70.36605287524293,
+              "dt": 89.13100004196167
+            }
+          },
+          {
+            "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+            "score": 6.642151904751193,
+            "measurements": {
+              "plausibility": 0.5982767835313088,
+              "heading": 0.03068996510389166,
+              "vel_cos": 0.002951706313964797,
+              "vel_w2": 44.077957599991215,
+              "pos_w2": 38375.37300046716,
+              "alt_w2": 2276.2152741160567,
+              "dt": 82.82999992370605
+            }
+          },
+          {
+            "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+            "score": 12.688001670224782,
+            "measurements": {
+              "plausibility": 0.9481449395018716,
+              "heading": 0.07312205070523992,
+              "vel_cos": 0.006211342246794427,
+              "vel_w2": 26.319810203932516,
+              "pos_w2": 16840.404909664223,
+              "alt_w2": 219.22586984392095,
+              "dt": 99.63000011444092
+            }
+          },
+          {
+            "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+            "score": 13.993549866065983,
+            "measurements": {
+              "plausibility": 0.9056607722592976,
+              "heading": 0.07860163865804326,
+              "vel_cos": 0.0020627346980897077,
+              "vel_w2": 27.667775368989652,
+              "pos_w2": 14486.018050689168,
+              "alt_w2": 1788.6939295389636,
+              "dt": 91.08899998664856
+            }
+          },
+          {
+            "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+            "score": 54.3540045438588,
+            "measurements": {
+              "plausibility": 0.24033278464936622,
+              "heading": 0.34725623915068193,
+              "vel_cos": 0.03083422565691385,
+              "vel_w2": 79.04802279287065,
+              "pos_w2": 28507.9913964053,
+              "alt_w2": 1882.6444255762315,
+              "dt": 108.25099992752075
+            }
+          }
+        ]
+      },
+      {
+        "tracklet_id": "tracklet-b69bdaba-c068-687a-828f-edc2f5e05205",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "no tracklet starts after this one ends",
+        "candidates": []
+      },
+      {
+        "tracklet_id": "tracklet-5e77b4e1-9321-b39b-c6ae-3f1526a382de",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "no tracklet starts after this one ends",
+        "candidates": []
+      },
+      {
+        "tracklet_id": "tracklet-df01c8a9-9520-6a27-f47c-d1bd0171f144",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "no tracklet starts after this one ends",
+        "candidates": []
+      },
+      {
+        "tracklet_id": "tracklet-7afdc09c-2803-c43b-4a9e-e870ca73c5c2",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "no tracklet starts after this one ends",
+        "candidates": []
+      },
+      {
+        "tracklet_id": "tracklet-876dc149-343f-8e0b-51f5-efd1fd0332fd",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "no tracklet starts after this one ends",
+        "candidates": []
+      },
+      {
+        "tracklet_id": "tracklet-d81aeacc-bf68-3c7f-cf62-6b79ae4a3976",
+        "status": "unresolved",
+        "successor": null,
+        "score": null,
+        "reason": "no tracklet starts after this one ends",
+        "candidates": []
+      }
+    ]
+  }
+}

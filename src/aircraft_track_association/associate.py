@@ -1,4 +1,5 @@
-"""Link each tracklet to at most one successor with a cost matrix and Hungarian assignment.
+"""Gaussian continuity model: link each tracklet to at most one successor with a cost
+matrix and Hungarian assignment.
 
 For every ordered pair (source, target) where the target starts after the source ends, seven
 cost terms are computed, each divided by a fixed scale and weighted (both set in weights.py).
@@ -10,6 +11,7 @@ or a "no match" option, so every tracklet ends up with at most one successor and
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 
+from .decision import candidate, record, short
 from .track import Tracklet
 from .weights import NO_MATCH_COST, SCALES, WEIGHTS
 
@@ -84,12 +86,56 @@ def match(
     so a source is linked only when its link costs less than leaving it unmatched, and any
     target may go without a predecessor at no cost.
     """
-    n = len(tracklets)
-    cost, _ = cost_matrix(tracklets, weights)
+    links = assign(cost_matrix(tracklets, weights)[0], no_match_cost)
+    return {tracklets[i].id: tracklets[j].id for i, j in links.items()}
+
+
+def assign(cost: np.ndarray, no_match_cost: float) -> dict[int, int]:
+    """{source index: target index} from the augmented Hungarian solve described in match."""
+    n = len(cost)
     big = np.full((2 * n, 2 * n), np.inf)
     big[:n, :n] = cost
     big[:n, n:][np.diag_indices(n)] = no_match_cost
     big[n:, :n] = 0.0
     big[n:, n:] = 0.0
     rows, cols = linear_sum_assignment(big)
-    return {tracklets[i].id: tracklets[j].id for i, j in zip(rows, cols) if i < n and j < n}
+    return {int(i): int(j) for i, j in zip(rows, cols) if i < n and j < n}
+
+
+def decide(
+    tracklets: list[Tracklet], no_match_cost: float = NO_MATCH_COST, weights=WEIGHTS
+) -> list[dict]:
+    """Per-tracklet decision records (see decision.py); score is the weighted cost."""
+    cost, terms = cost_matrix(tracklets, weights)
+    links = assign(cost, no_match_cost)
+    owner = {j: i for i, j in links.items()}  # target index -> source index that took it
+    out = []
+    for i, tr in enumerate(tracklets):
+        order = sorted(
+            (j for j in range(len(tracklets)) if (i, j) in terms), key=lambda j: cost[i, j]
+        )
+        cands = [candidate(tracklets[j].id, cost[i, j], terms[(i, j)]) for j in order]
+        j = links.get(i)
+        if j is not None:
+            pt = terms[(i, j)]
+            reason = (
+                f"chosen in the lowest-total-cost assignment: cost {cost[i, j]:.3f} "
+                f"(no-match {no_match_cost}), gap {pt['dt']:.0f} s, "
+                f"altitude difference {pt['alt_w2']:.0f} m"
+            )
+        elif not order:
+            reason = "no tracklet starts after this one ends"
+        elif cost[i, order[0]] >= no_match_cost:
+            reason = (
+                f"best candidate {short(tracklets[order[0]].id)} costs {cost[i, order[0]]:.3f}, "
+                f"not below the no-match cost {no_match_cost}"
+            )
+        elif order[0] in owner:
+            reason = (
+                f"best candidate {short(tracklets[order[0]].id)} (cost {cost[i, order[0]]:.3f}) "
+                f"went to {short(tracklets[owner[order[0]]].id)} in the lower-total-cost assignment"
+            )
+        else:
+            reason = "left unmatched because every link it could take raises the total cost"
+        out.append(record(tr.id, cands, tracklets[j].id if j is not None else None, reason))
+    return out

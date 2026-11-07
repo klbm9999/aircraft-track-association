@@ -1,10 +1,11 @@
-# Tracklet Association Heuristic - Results
+# Gaussian Continuity Model - Results
 
 ## Summary
 
-A hand-tuned heuristic links tracklets with micro F1 0.993 on validation and 0.985 on the 69 train scenarios that played no part in tuning.
+The Gaussian continuity model, a hand-tuned heuristic, links tracklets with micro F1 0.993 on validation and 0.985 on the 69 train scenarios that played no part in tuning.
 It makes 1 wrong link on validation and 11 on held-out train.
 No tracklet without a labelled successor was ever given one, in any partition.
+The constant-velocity baseline and its results are described in the README.
 
 ## Final results (frozen method)
 
@@ -168,7 +169,7 @@ The operating threshold should be chosen on validation, as the challenge require
 ## Reproduce
 
 ```bash
-uv run python -m aircraft_track_association candidate-packet/data/train/scenario_*
-uv run python -m aircraft_track_association candidate-packet/data/validation/scenario_*
-uv run python -m aircraft_track_association candidate-packet/data/train/scenario_017  # per-miss diagnostics
+uv run python -m aircraft_track_association evaluate candidate-packet/data/train/scenario_* --approach gaussian
+uv run python -m aircraft_track_association evaluate candidate-packet/data/validation/scenario_* --approach gaussian
+uv run python -m aircraft_track_association evaluate candidate-packet/data/train/scenario_017 --approach gaussian  # per-miss diagnostics
 ```

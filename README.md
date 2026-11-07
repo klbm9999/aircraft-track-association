@@ -144,7 +144,7 @@ Observation attributes, checked against speed and heading computed from each tra
 | all | `r7` | unknown | uniform between -10 and 10, uncorrelated with speed or heading | excluded |
 
 The speed and heading fields are plausible but redundant: the Gaussian model already measures speed and direction from positions, and the reported values include gross errors in 2.5-5.8% of reports.
-The identifiers change between fragments of the same aircraft more often than not and are sometimes shared by different aircraft, so they are not reliable identity evidence on their own; they could be a feature for a learned model.
+The identifiers change between fragments of the same aircraft more often than not and are sometimes shared by different aircraft, so they are not reliable identity evidence on their own; a reference-code match, with the placeholder C0FFEE ignored, is one feature of the learned model.
 Leaving them out keeps both approaches on documented fields plus `a1`.
 
 `a1` is read as altitude in metres because, on the 10,194 train observations that also report `altitude_ft`, it agrees with `altitude_ft * 0.3048` with correlation 0.999, median ratio 1.000 and at most 162 m difference.

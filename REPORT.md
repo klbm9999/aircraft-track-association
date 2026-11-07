@@ -338,3 +338,32 @@ uv run python -m aircraft_track_association evaluate candidate-packet/data/train
 uv run python -m aircraft_track_association evaluate candidate-packet/data/validation/scenario_* --approach gaussian
 uv run python -m aircraft_track_association evaluate candidate-packet/data/train/scenario_017 --approach gaussian  # per-miss diagnostics
 ```
+
+## Learned approach
+
+The learned approach was produced by an AI coding agent as a port of an AI-built reference solution.
+It was not designed by the author.
+
+Each candidate is a later tracklet that starts strictly after the source ends.
+The features are gap, straight-line distance, projected miss and its along-track and cross-track parts, miss over a gap allowance fit on train true links, end and start speeds and their difference, heading change, implied straight speed, counts of earlier candidates and earlier plausible candidates, altitude difference, reported speed and heading differences, reported speed versus kinematic speed, reference-code match with placeholder `C0FFEE` ignored, and the low-quality report fraction.
+`altitude_missing_count` did not vary after altitude fill, so it was dropped.
+A `HistGradientBoostingClassifier` (learning rate 0.08, 200 iterations, depth 4, minimum 20 samples per leaf, L2 0.1, seed 42) is fit on train candidate pairs only.
+Greedy selection keeps a link when its score is at least 0.05 and its margin over the runner-up is at least 0.20.
+Those two thresholds were chosen on validation to maximise recall subject to precision at least 0.95.
+The test labels had already been read during earlier work on the other approaches.
+This model was developed on train and validation only and run on test once.
+
+| Partition | Correct / true links | Wrong | Unresolved | Precision | Recall |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Train (80) | 1364 / 1364 | 0 | 0 | 1.000 | 1.000 |
+| Validation (20) | 327 / 335 | 0 | 8 | 1.000 | 0.976 |
+| Test (20) | 327 / 339 | 0 | 12 | 1.000 | 0.965 |
+
+Validation trade-off, from `artifacts/learned.json`.
+All three settings met their precision floor.
+
+| Profile | Rule | Minimum score | Minimum margin | Precision | Recall | Wrong | Unresolved |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Conservative | mutual best | 0.05 | 0 | 0.997 | 0.973 | 1 | 8 |
+| Operating | greedy | 0.05 | 0.20 | 1.000 | 0.976 | 0 | 8 |
+| Permissive | greedy | 0.05 | 0 | 0.997 | 0.973 | 1 | 8 |

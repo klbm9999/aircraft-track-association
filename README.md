@@ -5,7 +5,7 @@ Govia ML Engineer take-home: associate fragmented aircraft tracklets into per-ai
 ## Layout
 
 - `candidate-packet/` - the original assessment data package, copied verbatim (see `candidate-packet/README.md`).
-- `src/aircraft_track_association/` - heuristic tracklet association.
+- `src/aircraft_track_association/` - heuristic tracklet association; decision settings (weights, scales, no-match cost) are in `weights.py`.
 - `tests/` - unit tests and a scenario_001 regression check.
 
 ## Method

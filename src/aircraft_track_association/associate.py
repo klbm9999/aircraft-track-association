@@ -15,13 +15,15 @@ SCALES = {
     "pos_w2": 56_000.0,  # m
     "dt": 225.0,  # s
 }
+# Tuned by hand on train scenarios 002-011 (see REPORT.md). Heading carries the most weight
+# because it separates aircraft flying in parallel, where the other terms nearly tie.
 WEIGHTS = {
     "plausibility": 0.35,  # |log(actual gap / projected gap)|
-    "heading": 0.15,  # 1 - cos(source mean velocity, source->target mean position offset)
+    "heading": 3.0,  # 1 - cos(source mean velocity, source->target mean position offset)
     "vel_cos": 0.15,  # 1 - cos(source mean velocity, target mean velocity)
-    "vel_w2": 0.2,  # Wasserstein-2 between velocity Gaussians
-    "pos_w2": 0.1,  # Wasserstein-2 between position Gaussians
-    "dt": 0.05,  # gap length, so a link that skips an intermediate tracklet costs more
+    "vel_w2": 0.05,  # Wasserstein-2 between velocity Gaussians
+    "pos_w2": 0.03,  # Wasserstein-2 between position Gaussians
+    "dt": 0.15,  # gap length, so a link that skips an intermediate tracklet costs more
 }
 NO_MATCH_COST = 1.0  # a pair is linked only if its weighted cost is below this
 
@@ -61,7 +63,7 @@ def pair_terms(src: Tracklet, dst: Tracklet) -> dict[str, float] | None:
     }
 
 
-def cost_matrix(tracklets: list[Tracklet]) -> tuple[np.ndarray, dict]:
+def cost_matrix(tracklets: list[Tracklet], weights=WEIGHTS) -> tuple[np.ndarray, dict]:
     """Weighted cost per (source, target) index pair; inf where the pair is gated out."""
     n = len(tracklets)
     terms = {
@@ -72,15 +74,17 @@ def cost_matrix(tracklets: list[Tracklet]) -> tuple[np.ndarray, dict]:
     }
     cost = np.full((n, n), np.inf)
     for (i, j), pt in terms.items():
-        cost[i, j] = sum(w * pt[k] / SCALES[k] for k, w in WEIGHTS.items())
+        cost[i, j] = sum(w * pt[k] / SCALES[k] for k, w in weights.items())
     return cost, terms
 
 
-def match(tracklets: list[Tracklet], no_match_cost: float = NO_MATCH_COST) -> dict[str, str]:
+def match(
+    tracklets: list[Tracklet], no_match_cost: float = NO_MATCH_COST, weights=WEIGHTS
+) -> dict[str, str]:
     """Hungarian assignment over an augmented matrix: each source takes one target or a
     per-source dummy at no_match_cost; targets left without a predecessor cost nothing."""
     n = len(tracklets)
-    cost, _ = cost_matrix(tracklets)
+    cost, _ = cost_matrix(tracklets, weights)
     big = np.full((2 * n, 2 * n), np.inf)
     big[:n, :n] = cost
     big[:n, n:][np.diag_indices(n)] = no_match_cost

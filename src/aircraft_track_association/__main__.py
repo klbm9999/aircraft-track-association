@@ -1,6 +1,7 @@
 """Run association on one scenario and report link metrics.
 
-Usage: python -m aircraft_track_association <scenario_dir>
+Usage: python -m aircraft_track_association <scenario_dir> [<scenario_dir> ...]
+One directory prints per-link diagnostics; several print one line each plus micro totals.
 """
 
 import sys
@@ -39,5 +40,25 @@ def main(scenario_dir: Path) -> None:
                 print(f"  {label:9} cost={cost[index[src], index[tid]]:.3f} {detail}")
 
 
+def summary(scenario_dirs: list[Path]) -> None:
+    totals = {"correct_links": 0, "predicted_links": 0, "true_links": 0}
+    for d in scenario_dirs:
+        predicted = match(build_tracklets(load_observations(d)))
+        m = link_metrics(predicted, load_successors(d))
+        for k in totals:
+            totals[k] += m[k]
+        print(
+            f"{d.name}  correct {m['correct_links']:2}/{m['true_links']:2}  "
+            f"predicted {m['predicted_links']:2}  p {m['precision']:.3f}  "
+            f"r {m['recall']:.3f}  f1 {m['f1']:.3f}"
+        )
+    tp, n_pred, n_true = totals.values()
+    p, r = tp / n_pred, tp / n_true
+    print(
+        f"micro ({len(scenario_dirs)} scenarios)  p {p:.3f}  r {r:.3f}  f1 {2 * p * r / (p + r):.3f}"
+    )
+
+
 if __name__ == "__main__":
-    main(Path(sys.argv[1]))
+    dirs = [Path(a) for a in sys.argv[1:]]
+    main(dirs[0]) if len(dirs) == 1 else summary(dirs)
